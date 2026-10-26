@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Jingbin Wang's portfolio project: a visual framework exploring ten machine learning algorithms, their types, application domains, and real-world use cases.">
+  <title>Machine Learning Algorithms | Jingbin Wang's Portfolio</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #142b4a;
+      --navy-light: #203f66;
+      --teal: #167c78;
+      --gold: #efb54a;
+      --ink: #25364a;
+      --muted: #5d6d7e;
+      --paper: #f3f6f8;
+      --line: #dce4ea;
+      --white: #fff;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Arial, sans-serif;
+      line-height: 1.65;
+    }
+    a { color: var(--teal); }
+    a:focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 3px;
+    }
+    .hero {
+      padding: 76px 24px 68px;
+      background:
+        radial-gradient(ellipse at 85% 15%, #ffffff18, transparent 34%),
+        linear-gradient(135deg, var(--navy), var(--navy-light));
+      color: var(--white);
+    }
+    .hero-content, main, .nav-content, footer {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+    .eyebrow {
+      margin: 0 0 12px;
+      color: #f4c96e;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      max-width: 850px;
+      margin: 0;
+      font-size: clamp(2.35rem, 6vw, 4.4rem);
+      line-height: 1.08;
+    }
+    .hero-lead {
+      max-width: 710px;
+      margin: 22px 0;
+      color: #e0e9f1;
+      font-size: 1.15rem;
+    }
+    .hero-meta {
+      margin: 26px 0 0;
+      color: #d2deea;
+      font-size: 0.95rem;
+    }
+    .hero-meta span + span::before {
+      content: " / ";
+      padding: 0 8px;
+      color: #f4c96e;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .button {
+      display: inline-block;
+      padding: 11px 17px;
+      border: 1px solid #ffffff66;
+      border-radius: 7px;
+      color: var(--white);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .button.primary {
+      border-color: var(--gold);
+      background: var(--gold);
+      color: var(--navy);
+    }
+    .button:hover { transform: translateY(-1px); }
+    nav {
+      position: sticky;
+      z-index: 2;
+      top: 0;
+      border-bottom: 1px solid var(--line);
+      background: #ffffffed;
+      backdrop-filter: blur(10px);
+    }
+    .nav-content {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding: 10px 20px;
+    }
+    nav a {
+      flex: 0 0 auto;
+      padding: 7px 11px;
+      border-radius: 6px;
+      color: var(--navy);
+      font-size: 0.92rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    nav a:hover { background: #eaf0f4; }
+    main { padding: 34px 20px 20px; }
+    section {
+      margin-bottom: 26px;
+      padding: clamp(22px, 4vw, 36px);
+      border: 1px solid #e5ebef;
+      border-radius: 14px;
+      background: var(--white);
+      box-shadow: 0 5px 18px #142b4a0a;
+      scroll-margin-top: 76px;
+    }
+    .section-heading { margin-bottom: 22px; }
+    .section-kicker {
+      margin: 0 0 5px;
+      color: var(--teal);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    h2, h3 { color: var(--navy); line-height: 1.25; }
+    h2 { margin: 0; font-size: clamp(1.55rem, 3vw, 2rem); }
+    h3 { margin: 0 0 9px; font-size: 1.12rem; }
+    p { margin: 0 0 14px; }
+    p:last-child { margin-bottom: 0; }
+    .intro-grid, .learning-grid, .domain-grid, .algorithm-grid {
+      display: grid;
+      gap: 16px;
+    }
+    .intro-grid { grid-template-columns: 1.35fr 0.85fr; }
+    .learning-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .domain-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .algorithm-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .callout, .learning-card, .domain-card, .algorithm-card {
+      border-radius: 10px;
+      background: #f6f8fa;
+    }
+    .callout { padding: 20px; }
+    .callout h3 { font-size: 1rem; }
+    .callout.supervised { border-top: 4px solid var(--teal); }
+    .callout.unsupervised { border-top: 4px solid var(--gold); }
+    .callout p, .learning-card p, .domain-card p { color: var(--muted); }
+    .callout strong { color: var(--navy); }
+    .note {
+      margin-top: 16px;
+      padding: 13px 16px;
+      border-left: 4px solid var(--gold);
+      background: #fff8e9;
+      color: #564a34;
+      font-size: 0.94rem;
+    }
+    .algorithm-card {
+      display: flex;
+      flex-direction: column;
+      padding: 19px;
+      border: 1px solid var(--line);
+    }
+    .algorithm-title {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .number {
+      color: var(--teal);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+    .algorithm-type {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+    .domain-tags { margin: 0 0 12px; }
+    .tag {
+      display: inline-block;
+      margin: 0 5px 5px 0;
+      padding: 3px 9px;
+      border-radius: 20px;
+      background: #e5f1ef;
+      color: #155d5a;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .algorithm-card p { font-size: 0.92rem; }
+    .algorithm-card .how { margin-top: auto; padding-top: 13px; }
+    .algorithm-card strong { color: var(--navy); }
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    caption {
+      padding: 0 0 12px;
+      color: var(--muted);
+      text-align: left;
+    }
+    th, td {
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th {
+      background: #f1f5f7;
+      color: var(--navy);
+      font-size: 0.86rem;
+    }
+    td:first-child { font-weight: 700; }
+    .domain-card { padding: 18px; }
+    .domain-card h3 { font-size: 1rem; }
+    .domain-card p { margin: 0; font-size: 0.9rem; }
+    .reflection {
+      border-left: 4px solid var(--teal);
+      padding-left: 20px;
+    }
+    .reflection p { max-width: 800px; }
+    footer {
+      padding: 12px 20px 32px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    @media (max-width: 760px) {
+      .hero { padding: 58px 20px 48px; }
+      .intro-grid, .domain-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 560px) {
+      .learning-grid, .algorithm-grid, .intro-grid, .domain-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero-meta span { display: block; }
+      .hero-meta span + span::before { content: ""; padding: 0; }
+      th, td { padding: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-content">
+      <p class="eyebrow">Portfolio Project · Model Development</p>
+      <h1>Machine Learning Algorithms</h1>
+      <p class="hero-lead">
+        A visual framework for understanding ten algorithm types, how they work,
+        where they are applied, and the real-world problems they can help solve.
+      </p>
+      <p class="hero-meta">
+        <span>Jingbin Wang</span>
+        <span>Indiana Wesleyan University</span>
+        <span>AIML-501 · October 26, 2026</span>
+      </p>
+      <div class="hero-actions">
+        <a class="button primary" href="#algorithms">Explore the algorithms</a>
+        <a class="button" href="1.5%20Portfolio%20-%20Algorithm%20Types.docx">Download the project document</a>
+      </div>
+    </div>
+  </header>
+
+  <nav aria-label="Page sections">
+    <div class="nav-content">
+      <a href="#overview">Overview</a>
+      <a href="#algorithms">10 Algorithms</a>
+      <a href="#relationships">Compare by goal</a>
+      <a href="#domains">Application domains</a>
+      <a href="#reflection">Reflection</a>
+    </div>
+  </nav>
+
+  <main>
+    <section id="overview">
+      <div class="section-heading">
+        <p class="section-kicker">The framework</p>
+        <h2>Two broad learning approaches</h2>
+      </div>
+      <div class="intro-grid">
+        <article class="callout supervised">
+          <h3>Supervised learning</h3>
+          <p>
+            Learns from labeled examples to predict a target value or assign a
+            class. The framework includes Linear Regression, Logistic Regression,
+            Decision Tree, Random Forest, SVM, KNN, and CNN.
+          </p>
+        </article>
+        <article class="callout unsupervised">
+          <h3>Unsupervised learning</h3>
+          <p>
+            Finds patterns or structure in data without a target label. K-Means
+            and PCA are core examples in this framework.
+          </p>
+        </article>
+      </div>
+      <p class="note">
+        <strong>Generative model:</strong> GANs learn to create synthetic
+        examples through adversarial training. Their training setup can vary,
+        so a GAN is not always strictly unsupervised.
+      </p>
+    </section>
+
+    <section id="algorithms">
+      <div class="section-heading">
+        <p class="section-kicker">The collection</p>
+        <h2>10 algorithms, explained</h2>
+        <p>Each profile highlights its common learning type, application domains, a use case, and how it works.</p>
+      </div>
+      <div class="algorithm-grid">
+        <article class="algorithm-card">
+          <div class="algorithm-title"><span class="number">01</span><h3>Linear Regression</h3></div>
+          <p class="algorithm-type">Supervised · Regression</p>
+          <div class="domain-tags"><span class="tag">Tabular Data</span></div>
+          <p><strong>Real-world use:</strong> Forecasting house prices, sales, or energy demand from numeric features.</p>
+          <p class="how"><strong>How it works:</strong> Fits a line or hyperplane that minimizes squared differences between predicted and observed numeric values.</p>
+        </article>
+
+        <article class="algorithm-card">
+          <div class="algorithm-title"><span class="number">02</span><h3>Logistic Regression</h3></div>
+          <p class="algorithm-type">Supervised · Classification</p>
+          <div class="domain-tags"><span class="tag">Tabular Data</span><span class="tag">NLP</span></div>
+          <p><strong>Real-world use:</strong> Predicting customer churn or classifying an email or review as spam or not spam.</p>
+          <p class="how"><strong>How it works:</strong> Maps weighted input features to class probabilities, commonly using the logistic (sigmoid) function for binary classification.</p>
+        </article>
+
+        <article class="algorithm-card">
+          <div class="algorithm-title"><span class="number">03</span><h3>Decision Tree</h3></div>
+          <p class="algorithm-type">Supervised · Classification / Regression</p>
+          <div class="domain-tags"><span class="tag">Tabular Data</span><span class="tag">Computer Vision*</span></div>
+          <p><strong>Real-world use:</strong> Assessing loan risk or predicting whether a customer is likely to leave.</p>
+          <p class="how"><strong>How it works:</strong> Splits data through feature-based questions; each branch narrows the decision until a prediction is reached.</p>
+        </article>
+
+        <article class="algorithm-card">
+          <div class="algorithm-title"><span class="number">04</span><h3>Random Forest</h3></div>
+          <p class="algorithm-type">Supervised · Ensemble</p>
+          <div class="domain-tags"><span class="tag">Tabular Data</span><span class="tag">Computer Vision*</span></div>
+          <p><strong>Real-world use:</strong> Fraud detection, credit-risk scoring, and feature-based medical risk prediction.</p>
+          <p class="how"><strong>How it works:</strong> Trains many decision trees on varied samples and features, then combines their predictions to improve robustness and reduce overfitting.</p>
+        </article>
+
+        <article class="algorithm-card">
+          <div class="algorithm-title"><span class="number">05</span><h3>Support Vector Machine (SVM)</h3></div>
+          <p class="algorithm-type">Supervised · Classification / Regression</p>
+          <div class="domain-tags"><span class="tag">Tabular Data</span><span class="tag">Computer Vision</span><span class="tag">NLP</span></div>
+          <p><strong>Real-world use:</strong> Classifying images, categorizing text, or detecting sentiment with engineered features.</p>
+          <p class="how"><strong>How it works:</strong> Finds a decision boundary that maximizes the margin between classes; kernels can model nonlinear boundaries.</p>
+        </article>
+
+        <article class="algorithm-card">
+          <div class="algorithm-title"><span class="number">06</span><h3>K-Nearest Neighbors (KNN)</h3></div>
+          <p class="algorithm-type">Supervised · Instance-based</p>
+          <div class="domain-tags"><span class="tag">Tabular Data</span><span class="tag">Computer Vision</span></div>
+          <p><strong>Real-world use:</strong> Classifying a handwritten digit or recommending similar items or users from feature similarity.</p>
+          <p class="how"><strong>How it works:</strong> Looks up the k most similar training examples; predicts by majority vote for classification or averages values for regression.</p>
+        </article>
+
+        <article class="algorithm-card">
+          <div class="algorithm-title"><span class="number">07</span><h3>K-Means Clustering</h3></div>
+          <p class="algorithm-type">Unsupervised · Clustering</p>
+          <div class="domain-tags"><span class="tag">Tabular Data</span><span class="tag">Computer Vision*</span></div>
+          <p><strong>Real-world use:</strong> Segmenting customers into behavior groups or grouping similar image colors and pixels.</p>
+          <p class="how"><strong>How it works:</strong> Assigns points to k clusters around centroids, then repeatedly updates assignments and centroids to reduce within-cluster distances.</p>
+        </article>
+
+        <article class="algorithm-card">
+          <div class="algorithm-title"><span class="number">08</span><h3>Principal Component Analysis (PCA)</h3></div>
+          <p class="algorithm-type">Unsupervised · Dimensionality reduction</p>
+          <div class="domain-tags"><span class="tag">Tabular Data</span><span class="tag">Computer Vision</span><span class="tag">NLP*</span></div>
+          <p><strong>Real-world use:</strong> Compressing high-dimensional sensor data or reducing image and feature dimensions before modeling.</p>
+          <p class="how"><strong>How it works:</strong> Transforms correlated features into fewer orthogonal components that preserve as much data variance as possible.</p>
+        </article>
+
+        <article class="algorithm-card">
+          <div class="algorithm-title"><span class="number">09</span><h3>Convolutional Neural Network (CNN)</h3></div>
+          <p class="algorithm-type">Supervised (common use) · Deep learning</p>
+          <div class="domain-tags"><span class="tag">Computer Vision</span></div>
+          <p><strong>Real-world use:</strong> Detecting production-line defects, identifying objects, or assisting medical-image classification.</p>
+          <p class="how"><strong>How it works:</strong> Learns filters that detect local patterns such as edges and textures, building them into increasingly complex visual features.</p>
+        </article>
+
+        <article class="algorithm-card">
+          <div class="algorithm-title"><span class="number">10</span><h3>Generative Adversarial Network (GAN)</h3></div>
+          <p class="algorithm-type">Generative model · Adversarial training</p>
+          <div class="domain-tags"><span class="tag">Generative AI</span><span class="tag">Computer Vision</span></div>
+          <p><strong>Real-world use:</strong> Generating synthetic faces or product images, creating training data, or translating images.</p>
+          <p class="how"><strong>How it works:</strong> Trains two networks together: a generator creates synthetic samples while a discriminator learns to distinguish generated samples from real ones.</p>
+        </article>
+      </div>
+      <p class="note">
+        <strong>About domain tags:</strong> A tag indicates a plausible application,
+        not that an algorithm is always the best choice. The asterisk marks
+        applications using image-derived features; CNNs are more purpose-built
+        for raw spatial image patterns. PCA can also be applied to text features.
+      </p>
+    </section>
+
+    <section id="relationships">
+      <div class="section-heading">
+        <p class="section-kicker">Choosing an approach</p>
+        <h2>Compare algorithms by goal</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <caption>How the algorithms relate to common machine learning goals.</caption>
+          <thead>
+            <tr><th scope="col">Goal</th><th scope="col">Algorithm(s)</th><th scope="col">Key difference</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Predict a number</td><td>Linear Regression</td><td>Supervised regression predicts a continuous value.</td></tr>
+            <tr><td>Predict a category</td><td>Logistic Regression, Decision Tree, Random Forest, SVM, KNN, CNN</td><td>Supervised classification methods differ in decision boundaries and feature learning.</td></tr>
+            <tr><td>Combine multiple models</td><td>Random Forest</td><td>An ensemble of trees; typically more robust than a single tree.</td></tr>
+            <tr><td>Find groups without labels</td><td>K-Means</td><td>Reveals groups based on similarity rather than known target labels.</td></tr>
+            <tr><td>Reduce the number of features</td><td>PCA</td><td>Simplifies data while preserving its major variance.</td></tr>
+            <tr><td>Learn visual features</td><td>CNN</td><td>A deep neural network architecture especially effective for image and spatial data.</td></tr>
+            <tr><td>Create synthetic examples</td><td>GAN</td><td>Generative modeling learns to produce samples resembling its training data.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="domains">
+      <div class="section-heading">
+        <p class="section-kicker">Where data lives</p>
+        <h2>Four application domains</h2>
+      </div>
+      <div class="domain-grid">
+        <article class="domain-card">
+          <h3>Tabular Data</h3>
+          <p>Rows and columns: business metrics, finance, sales, risk, and customer records.</p>
+        </article>
+        <article class="domain-card">
+          <h3>Computer Vision</h3>
+          <p>Images and video: object recognition, defect detection, and medical imaging.</p>
+        </article>
+        <article class="domain-card">
+          <h3>Natural Language Processing (NLP)</h3>
+          <p>Text and language: spam filtering, sentiment classification, and text feature analysis.</p>
+        </article>
+        <article class="domain-card">
+          <h3>Generative AI</h3>
+          <p>Creating new content such as images; GANs are a classic generative approach.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="reflection">
+      <div class="section-heading">
+        <p class="section-kicker">Learning reflection</p>
+        <h2>From algorithm names to problem-solving</h2>
+      </div>
+      <div class="reflection">
+        <p>
+          Creating this visual framework helped me understand that machine
+          learning algorithms differ in their learning approaches, goals, and
+          applications. Supervised learning uses labeled examples to make
+          predictions, while unsupervised learning helps identify patterns or
+          structure in data.
+        </p>
+        <p>
+          Comparing these algorithms also showed me that selecting a method
+          depends on the problem, the available data, and the desired outcome.
+          I can apply this understanding when evaluating data-driven solutions
+          to real-world problems.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Jingbin Wang · AIML-501 Model Development · Indiana Wesleyan University</p>
+  </footer>
+</body>
+</html>
