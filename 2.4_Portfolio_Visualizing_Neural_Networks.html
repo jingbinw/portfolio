@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Jingbin Wang's presentation visualizing neural networks through five TensorFlow Neural Network Playground experiments.">
+  <title>Visualizing Neural Networks | Jingbin Wang</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #142b4a;
+      --navy-light: #203f66;
+      --teal: #167c78;
+      --gold: #efb54a;
+      --ink: #25364a;
+      --muted: #607184;
+      --paper: #f3f6f8;
+      --line: #dce4ea;
+      --white: #fff;
+      --blue: #4285b4;
+      --orange: #e79536;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Arial, sans-serif;
+      line-height: 1.65;
+    }
+    a { color: var(--teal); }
+    a:focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 3px;
+    }
+    .hero {
+      padding: 76px 24px 66px;
+      background:
+        radial-gradient(ellipse at 86% 16%, #ffffff18, transparent 34%),
+        linear-gradient(135deg, var(--navy), var(--navy-light));
+      color: var(--white);
+    }
+    .hero-content, main, .nav-content, footer {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+    .home-link {
+      display: inline-block;
+      margin-bottom: 32px;
+      color: #e1eaf2;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+    .home-link:hover { color: var(--white); text-decoration: underline; }
+    .eyebrow {
+      margin: 0 0 12px;
+      color: #f4c96e;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      max-width: none;
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 3.8rem);
+      line-height: 1.05;
+    }
+    .hero-lead {
+      max-width: 740px;
+      margin: 20px 0;
+      color: #e0e9f1;
+      font-size: 1.14rem;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      margin: 25px 0 0;
+      color: #d2deea;
+      font-size: 0.93rem;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .button {
+      display: inline-block;
+      padding: 10px 16px;
+      border: 1px solid #ffffff66;
+      border-radius: 7px;
+      color: var(--white);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .button.primary { border-color: var(--gold); background: var(--gold); color: var(--navy); }
+    .button:hover { transform: translateY(-1px); }
+    nav {
+      position: sticky;
+      z-index: 3;
+      top: 0;
+      border-bottom: 1px solid var(--line);
+      background: #ffffffed;
+      backdrop-filter: blur(10px);
+    }
+    .nav-content { display: flex; gap: 6px; overflow-x: auto; padding: 10px 20px; }
+    nav a {
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      border-radius: 6px;
+      color: var(--navy);
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    nav a:hover { background: #eaf0f4; }
+    main { padding: 34px 20px 20px; }
+    section {
+      margin-bottom: 26px;
+      padding: clamp(22px, 4vw, 36px);
+      border: 1px solid #e5ebef;
+      border-radius: 14px;
+      background: var(--white);
+      box-shadow: 0 5px 18px #142b4a0a;
+      scroll-margin-top: 76px;
+    }
+    .section-heading { margin-bottom: 22px; }
+    .section-kicker {
+      margin: 0 0 5px;
+      color: var(--teal);
+      font-size: 0.77rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    h2, h3 { color: var(--navy); line-height: 1.25; }
+    h2 { margin: 0; font-size: clamp(1.55rem, 3vw, 2rem); }
+    h3 { margin: 0 0 8px; font-size: 1.08rem; }
+    p { margin: 0 0 13px; }
+    p:last-child { margin-bottom: 0; }
+    .overview-grid, .concept-grid, .experiment-grid, .takeaway-grid {
+      display: grid;
+      gap: 16px;
+    }
+    .overview-grid { grid-template-columns: 1.1fr 0.9fr; }
+    .concept-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .experiment-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .takeaway-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .stacked-grid { margin-top: 18px; }
+    .top-gap { margin-top: 16px; }
+    .card, .concept-card, .experiment-card, .takeaway-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f7f9fa;
+    }
+    .card, .concept-card, .takeaway-card { padding: 19px; }
+    .card p, .concept-card p, .takeaway-card p { color: var(--muted); }
+    .card h3 { font-size: 1rem; }
+    .list-clean { margin: 0; padding-left: 20px; }
+    .list-clean li + li { margin-top: 5px; }
+    .note {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--gold);
+      background: #fff8e9;
+      color: #564a34;
+      font-size: 0.94rem;
+    }
+    .architecture {
+      overflow-x: auto;
+      padding: 12px 4px 4px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: linear-gradient(120deg, #f8fafb, #f0f5f7);
+    }
+    .architecture svg { display: block; width: min(900px, 100%); min-width: 660px; height: auto; margin: auto; }
+    .architecture-caption { margin: 12px 0 0; color: var(--muted); font-size: 0.9rem; text-align: center; }
+    .equation {
+      margin: 12px 0;
+      padding: 13px;
+      border-radius: 7px;
+      background: var(--navy);
+      color: var(--white);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 1rem;
+      text-align: center;
+    }
+    .process {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .process span {
+      padding: 11px 8px;
+      border-radius: 7px;
+      background: #eaf1f4;
+      color: var(--navy);
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-align: center;
+    }
+    .process b { display: block; color: var(--teal); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    caption { padding: 0 0 12px; color: var(--muted); text-align: left; }
+    th, td { padding: 12px 13px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { background: #f1f5f7; color: var(--navy); font-size: 0.86rem; }
+    td:first-child { font-weight: 700; }
+    .metric-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin: 14px 0; }
+    .metric {
+      padding: 11px 12px;
+      border-radius: 8px;
+      background: var(--navy);
+      color: var(--white);
+    }
+    .metric span { display: block; color: #cbd9e5; font-size: 0.72rem; }
+    .metric strong { display: block; margin-top: 2px; font-size: 1.15rem; }
+    .experiment-card { overflow: hidden; background: var(--white); }
+    .experiment-content { padding: 20px; }
+    .experiment-title { display: flex; align-items: baseline; gap: 10px; }
+    .experiment-number { color: var(--teal); font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; }
+    .experiment-card figure { margin: 0; }
+    .experiment-card figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-bottom: 1px solid var(--line);
+    }
+    figcaption { padding: 9px 14px; color: var(--muted); font-size: 0.8rem; }
+    .settings {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+    .settings strong, .experiment-content strong { color: var(--navy); }
+    .result-copy { margin-top: 13px; }
+    .result-copy p { font-size: 0.93rem; }
+    .observation-list { margin: 8px 0 0; padding-left: 20px; }
+    .observation-list li + li { margin-top: 5px; }
+    .highlight {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-left: 3px solid var(--teal);
+      background: #eef7f6;
+      color: #315553;
+      font-size: 0.92rem;
+    }
+    .interpret-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .interpret-card { padding: 19px; border-radius: 10px; background: #f7f9fa; }
+    .interpret-card h3 { font-size: 1rem; }
+    .interpret-card ul { margin: 0; padding-left: 20px; color: var(--muted); }
+    .interpret-card li + li { margin-top: 6px; }
+    .reflection { border-left: 4px solid var(--teal); padding-left: 20px; }
+    .reflection p { max-width: 850px; }
+    .source-link { overflow-wrap: anywhere; }
+    footer { padding: 12px 20px 32px; color: var(--muted); font-size: 0.9rem; text-align: center; }
+    @media (max-width: 800px) {
+      .overview-grid, .concept-grid, .takeaway-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px) {
+      .hero { padding: 52px 20px 46px; }
+      .experiment-grid, .interpret-grid, .overview-grid, .concept-grid, .takeaway-grid {
+        grid-template-columns: 1fr;
+      }
+      .process { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      th, td { padding: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-content">
+      <a class="home-link" href="index.html">← Portfolio home</a>
+      <p class="eyebrow">Hands-on Machine Learning · Presentation · Workshop 2.4</p>
+      <h1>Visualizing Neural Networks</h1>
+      <p class="hero-lead">
+        A visual presentation based on five experiments in TensorFlow Neural Network
+        Playground, exploring how noise, features, network depth, and dataset
+        shape affect learned decision boundaries and loss.
+      </p>
+      <div class="hero-meta">
+        <span><strong>Name:</strong> Jingbin Wang</span>
+        <span><strong>Date:</strong> November 5, 2026</span>
+        <span>Five recorded experiments</span>
+      </div>
+      <div class="hero-actions">
+        <a class="button primary" href="#experiments">Explore the experiments</a>
+        <a class="button" href="#setup">View experimental setup</a>
+      </div>
+    </div>
+  </header>
+
+  <nav aria-label="Page sections">
+    <div class="nav-content">
+      <a href="#overview">Study overview</a>
+      <a href="#architecture">Network architecture</a>
+      <a href="#components">Core components</a>
+      <a href="#setup">Setup</a>
+      <a href="#experiments">Experiments</a>
+      <a href="#comparison">Results</a>
+      <a href="#interpretation">Interpretation</a>
+      <a href="#method">Methodology</a>
+      <a href="#takeaways">Takeaways</a>
+      <a href="#reflection">Reflection & evidence</a>
+    </div>
+  </nav>
+
+  <main>
+    <section id="overview">
+      <div class="section-heading">
+        <p class="section-kicker">01 · Study overview</p>
+        <h2>What was tested and how results were compared</h2>
+      </div>
+      <div class="overview-grid">
+        <article class="card">
+          <h3>Study goal</h3>
+          <p>
+            Observe how data noise, input features, network depth, and dataset
+            type affect a neural network's learned decision boundary and loss.
+          </p>
+          <h3>Five recorded experiments</h3>
+          <ol class="list-clean">
+            <li>Baseline XOR model</li>
+            <li>Increased noise</li>
+            <li>Added the x<sub>1</sub>x<sub>2</sub> feature</li>
+            <li>Added a second hidden layer</li>
+            <li>Switched to the Circle dataset</li>
+          </ol>
+        </article>
+        <article class="card">
+          <h3>What was observed</h3>
+          <p>
+            Dataset pattern, selected features, hidden-layer count, neuron
+            count, epoch counter, Training Loss, and Test Loss.
+          </p>
+          <h3>Fair interpretation</h3>
+          <p>
+            Values represent the state displayed in each recording. Epoch
+            counters are not wall-clock training times; runs may have been
+            stopped at different points.
+          </p>
+        </article>
+      </div>
+      <p class="note">
+        <strong>Evidence source:</strong> The five supplied screen recordings.
+        Each experiment screenshot below is included with its recorded
+        configuration and reported result.
+      </p>
+    </section>
+
+    <section id="architecture">
+      <div class="section-heading">
+        <p class="section-kicker">02 · Neural network architecture</p>
+        <h2>How information flows through a feed-forward network</h2>
+        <p>A simplified architecture similar to the network explored in the Playground.</p>
+      </div>
+      <div class="architecture">
+        <svg viewBox="0 0 900 410" role="img" aria-labelledby="network-title network-description">
+          <title id="network-title">Feed-forward neural network architecture</title>
+          <desc id="network-description">Two input features connect to six hidden neurons, which connect to two output predictions. Arrows represent weighted information flow.</desc>
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L7,3 z" fill="#9aabb8"></path>
+            </marker>
+          </defs>
+          <g fill="none" stroke="#9aabb8" stroke-width="1.5" opacity=".7" marker-end="url(#arrow)">
+            <path d="M135 155 L390 70"></path><path d="M135 155 L390 120"></path>
+            <path d="M135 155 L390 170"></path><path d="M135 155 L390 220"></path>
+            <path d="M135 155 L390 270"></path><path d="M135 155 L390 320"></path>
+            <path d="M135 255 L390 70"></path><path d="M135 255 L390 120"></path>
+            <path d="M135 255 L390 170"></path><path d="M135 255 L390 220"></path>
+            <path d="M135 255 L390 270"></path><path d="M135 255 L390 320"></path>
+            <path d="M450 70 L710 155"></path><path d="M450 70 L710 255"></path>
+            <path d="M450 120 L710 155"></path><path d="M450 120 L710 255"></path>
+            <path d="M450 170 L710 155"></path><path d="M450 170 L710 255"></path>
+            <path d="M450 220 L710 155"></path><path d="M450 220 L710 255"></path>
+            <path d="M450 270 L710 155"></path><path d="M450 270 L710 255"></path>
+            <path d="M450 320 L710 155"></path><path d="M450 320 L710 255"></path>
+          </g>
+          <g fill="#e4f2f1" stroke="#167c78" stroke-width="3">
+            <circle cx="110" cy="155" r="30"></circle><circle cx="110" cy="255" r="30"></circle>
+          </g>
+          <g fill="#edf2f8" stroke="#426587" stroke-width="3">
+            <circle cx="420" cy="70" r="21"></circle><circle cx="420" cy="120" r="21"></circle>
+            <circle cx="420" cy="170" r="21"></circle><circle cx="420" cy="220" r="21"></circle>
+            <circle cx="420" cy="270" r="21"></circle><circle cx="420" cy="320" r="21"></circle>
+          </g>
+          <g fill="#fff3da" stroke="#c58b2a" stroke-width="3">
+            <circle cx="740" cy="155" r="30"></circle><circle cx="740" cy="255" r="30"></circle>
+          </g>
+          <g fill="#142b4a" font-family="Arial, sans-serif" font-size="17" font-weight="700" text-anchor="middle">
+            <text x="110" y="161">x₁</text><text x="110" y="261">x₂</text>
+            <text x="420" y="76">h₁</text><text x="420" y="126">h₂</text>
+            <text x="420" y="176">h₃</text><text x="420" y="226">h₄</text>
+            <text x="420" y="276">h₅</text><text x="420" y="326">h₆</text>
+            <text x="740" y="161">ŷ₁</text><text x="740" y="261">ŷ₂</text>
+          </g>
+          <g fill="#607184" font-family="Arial, sans-serif" font-size="15" font-weight="700" text-anchor="middle">
+            <text x="110" y="385">INPUT</text><text x="420" y="385">HIDDEN LAYER(S)</text><text x="740" y="385">OUTPUT</text>
+          </g>
+        </svg>
+      </div>
+      <p class="architecture-caption">
+        The input layer receives feature values. Hidden layers learn intermediate
+        patterns. The output layer produces class predictions. The middle layer
+        is simplified; the slide diagram labels six hidden units (h₁–h₆).
+      </p>
+    </section>
+
+    <section id="components">
+      <div class="section-heading">
+        <p class="section-kicker">03 · Core concepts</p>
+        <h2>Structure, computation, and learning</h2>
+      </div>
+      <div class="concept-grid">
+        <article class="concept-card">
+          <h3>Layers</h3>
+          <p>Groups of neurons arranged by processing stage. The input layer receives features, hidden layers learn patterns, and the output layer produces predictions.</p>
+        </article>
+        <article class="concept-card">
+          <h3>Neurons</h3>
+          <p>Small computational units. Each neuron combines incoming values, weights, and a bias, then applies an activation function.</p>
+        </article>
+        <article class="concept-card">
+          <h3>Weights</h3>
+          <p>Learned numbers on connections. They scale incoming signals and are adjusted during training to improve predictions.</p>
+        </article>
+      </div>
+      <div class="equation" aria-label="z equals the sum of each input multiplied by its weight, plus bias; output equals activation of z">
+        z = w₁x₁ + w₂x₂ + … + b &nbsp;&nbsp; → &nbsp;&nbsp; output = activation(z)
+      </div>
+      <p>
+        Input values are multiplied by weights, combined with a bias, and passed
+        through an activation function. Repeating this operation across layers
+        enables the network to learn patterns.
+      </p>
+      <div class="concept-grid stacked-grid">
+        <article class="concept-card">
+          <h3>Activation functions</h3>
+          <p>Transform a neuron's weighted sum. Tanh was used in all five recordings. It maps values into the range −1 to +1 and introduces non-linearity.</p>
+        </article>
+        <article class="concept-card">
+          <h3>Loss functions</h3>
+          <p>Measure prediction error. Training Loss measures error on training examples; Test Loss measures performance on held-out examples.</p>
+        </article>
+        <article class="concept-card">
+          <h3>Optimization algorithms</h3>
+          <p>Use gradients from the loss to update weights and biases. The Playground's training process iteratively adjusts parameters to reduce loss.</p>
+        </article>
+      </div>
+      <div class="process" aria-label="Training loop">
+        <span><b>1</b>Prediction</span>
+        <span><b>2</b>Calculate loss</span>
+        <span><b>3</b>Compute gradients</span>
+        <span><b>4</b>Update weights</span>
+      </div>
+      <p class="note">
+        This cycle repeats across training steps. Lower loss generally indicates
+        a closer fit to the target labels, but Test Loss is especially useful
+        for judging generalization.
+      </p>
+    </section>
+
+    <section id="setup">
+      <div class="section-heading">
+        <p class="section-kicker">04 · Experimental setup</p>
+        <h2>What stayed the same?</h2>
+        <p>The recordings show a mostly controlled comparison, with one main change in each experiment.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <caption>Shared Playground settings and settings varied across experiments.</caption>
+          <thead><tr><th scope="col">Setting</th><th scope="col">Observed value</th><th scope="col">Scope</th></tr></thead>
+          <tbody>
+            <tr><td>Problem type</td><td>Classification</td><td>All five</td></tr>
+            <tr><td>Learning rate</td><td>0.03</td><td>All five</td></tr>
+            <tr><td>Activation</td><td>Tanh</td><td>All five</td></tr>
+            <tr><td>Regularization</td><td>None (rate 0)</td><td>All five</td></tr>
+            <tr><td>Training / test split</td><td>50% / 50%</td><td>All five</td></tr>
+            <tr><td>Batch size</td><td>10</td><td>All five</td></tr>
+            <tr><td>Input features</td><td>x₁, x₂; x₁x₂ added in Experiment 3</td><td>Changed where noted</td></tr>
+            <tr><td>Hidden layers</td><td>One or two layers</td><td>Changed in Experiments 4 and 5</td></tr>
+            <tr><td>Dataset / noise</td><td>XOR or Circle; noise 0 or 30</td><td>Changed where noted</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">
+        Experiment 3 adds x₁x₂. Experiment 4 uses two hidden layers.
+        Experiment 5 changes the dataset to Circle and uses x₁ and x₂.
+      </p>
+    </section>
+
+    <section id="experiments">
+      <div class="section-heading">
+        <p class="section-kicker">05 · The five experiments</p>
+        <h2>Configurations, observed results, and interpretation</h2>
+        <p>Loss and epoch values below are transcribed from the presentation's recorded states.</p>
+      </div>
+      <div class="experiment-grid">
+        <article class="experiment-card">
+          <figure>
+            <img src="assets/neural-network-experiments/experiment-1-baseline-xor.png" alt="TensorFlow Playground screenshot of the baseline XOR classifier with one hidden layer and its decision boundary." loading="lazy">
+            <figcaption>Experiment 1 · Recorded Playground screen</figcaption>
+          </figure>
+          <div class="experiment-content">
+            <div class="experiment-title"><span class="experiment-number">01</span><h3>Baseline XOR model</h3></div>
+            <p>Starting point: one hidden layer with four neurons and the original two input features.</p>
+            <p class="settings"><strong>Dataset:</strong> XOR classification · <strong>Noise:</strong> 0 · <strong>Features:</strong> x₁, x₂ · <strong>Network:</strong> 1 × 4 neurons · <strong>Learning rate:</strong> 0.03 · <strong>Activation:</strong> Tanh</p>
+            <div class="metric-row">
+              <div class="metric"><span>Epoch shown</span><strong>1,868</strong></div>
+              <div class="metric"><span>Training Loss</span><strong>0.064</strong></div>
+              <div class="metric"><span>Test Loss</span><strong>0.190</strong></div>
+            </div>
+            <div class="result-copy">
+              <p><strong>What the result suggests:</strong> The baseline model learned part of the XOR pattern, but displayed Test Loss remained relatively high. The output map still showed imperfect class separation at capture.</p>
+              <p class="highlight"><strong>Key takeaway:</strong> XOR requires a non-linear decision boundary. This basic setup provides a comparison point, but had not yet reached very low Test Loss.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="experiment-card">
+          <figure>
+            <img src="assets/neural-network-experiments/experiment-2-noise.png" alt="TensorFlow Playground screenshot of a noisy XOR classification run with noise set to 30." loading="lazy">
+            <figcaption>Experiment 2 · Recorded Playground screen</figcaption>
+          </figure>
+          <div class="experiment-content">
+            <div class="experiment-title"><span class="experiment-number">02</span><h3>Increasing noise</h3></div>
+            <p>The main change was increasing dataset noise from 0 to 30.</p>
+            <p class="settings"><strong>Dataset:</strong> XOR classification · <strong>Noise:</strong> 30 · <strong>Features:</strong> x₁, x₂ · <strong>Network:</strong> 1 × 4 neurons · <strong>Learning rate:</strong> 0.03 · <strong>Activation:</strong> Tanh</p>
+            <div class="metric-row">
+              <div class="metric"><span>Epoch shown</span><strong>1,870</strong></div>
+              <div class="metric"><span>Training Loss</span><strong>0.075</strong></div>
+              <div class="metric"><span>Test Loss</span><strong>0.210</strong></div>
+            </div>
+            <div class="result-copy">
+              <p><strong>What the result suggests:</strong> Compared with baseline, both displayed losses were higher: Training Loss rose from 0.064 to 0.075 and Test Loss from 0.190 to 0.210. Output regions also appeared less cleanly separated.</p>
+              <p class="highlight"><strong>Key takeaway:</strong> Noise can obscure the underlying pattern. In this recorded run, measured error increased.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="experiment-card">
+          <figure>
+            <img src="assets/neural-network-experiments/experiment-3-feature.png" alt="TensorFlow Playground screenshot of the XOR experiment with the interaction feature x1 times x2 enabled and a four-quadrant boundary." loading="lazy">
+            <figcaption>Experiment 3 · Recorded Playground screen</figcaption>
+          </figure>
+          <div class="experiment-content">
+            <div class="experiment-title"><span class="experiment-number">03</span><h3>Adding an input feature</h3></div>
+            <p>The main change was enabling x₁x₂ while keeping the XOR task and one hidden layer.</p>
+            <p class="settings"><strong>Dataset:</strong> XOR classification · <strong>Noise:</strong> 0 · <strong>Features:</strong> x₁, x₂, x₁x₂ · <strong>Network:</strong> 1 × 4 neurons · <strong>Learning rate:</strong> 0.03 · <strong>Activation:</strong> Tanh</p>
+            <div class="metric-row">
+              <div class="metric"><span>Epoch shown</span><strong>1,497</strong></div>
+              <div class="metric"><span>Training Loss</span><strong>0.000</strong></div>
+              <div class="metric"><span>Test Loss</span><strong>0.001</strong></div>
+            </div>
+            <div class="result-copy">
+              <p><strong>What the result suggests:</strong> Displayed loss dropped substantially compared with baseline. The output map formed a clear four-quadrant pattern, closely matching XOR labels.</p>
+              <p class="highlight"><strong>Key takeaway:</strong> A useful engineered feature can make a difficult relationship easier to represent. x₁x₂ directly provides information about the interaction between the inputs.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="experiment-card">
+          <figure>
+            <img src="assets/neural-network-experiments/experiment-4-depth.png" alt="TensorFlow Playground screenshot of the XOR network expanded to two hidden layers with four neurons per layer." loading="lazy">
+            <figcaption>Experiment 4 · Recorded Playground screen</figcaption>
+          </figure>
+          <div class="experiment-content">
+            <div class="experiment-title"><span class="experiment-number">04</span><h3>Increasing network depth</h3></div>
+            <p>The network was expanded from one hidden layer to two, with four neurons in each layer.</p>
+            <p class="settings"><strong>Dataset:</strong> XOR classification · <strong>Noise:</strong> 0 · <strong>Features:</strong> x₁, x₂, x₁x₂ · <strong>Network:</strong> 2 × 4 neurons · <strong>Learning rate:</strong> 0.03 · <strong>Activation:</strong> Tanh</p>
+            <div class="metric-row">
+              <div class="metric"><span>Epoch shown</span><strong>1,149</strong></div>
+              <div class="metric"><span>Training Loss</span><strong>0.000</strong></div>
+              <div class="metric"><span>Test Loss</span><strong>0.007</strong></div>
+            </div>
+            <div class="result-copy">
+              <p><strong>What the result suggests:</strong> The two-hidden-layer model also achieved very low loss. Test Loss was 0.007, slightly higher than Experiment 3's 0.001, while Training Loss remained displayed as 0.000.</p>
+              <p class="highlight"><strong>Key takeaway:</strong> More layers increase capacity but do not automatically improve test performance. The simpler feature-augmented model had lower displayed Test Loss here.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="experiment-card">
+          <figure>
+            <img src="assets/neural-network-experiments/experiment-5-circle.png" alt="TensorFlow Playground screenshot of a two-hidden-layer classifier learning a circular decision region on the Circle dataset." loading="lazy">
+            <figcaption>Experiment 5 · Recorded Playground screen</figcaption>
+          </figure>
+          <div class="experiment-content">
+            <div class="experiment-title"><span class="experiment-number">05</span><h3>Switching to the Circle dataset</h3></div>
+            <p>The dataset changed from XOR to Circle; the network retained two hidden layers with four neurons each.</p>
+            <p class="settings"><strong>Dataset:</strong> Circle classification · <strong>Noise:</strong> 0 · <strong>Features:</strong> x₁, x₂ · <strong>Network:</strong> 2 × 4 neurons · <strong>Learning rate:</strong> 0.03 · <strong>Activation:</strong> Tanh</p>
+            <div class="metric-row">
+              <div class="metric"><span>Epoch shown</span><strong>1,192</strong></div>
+              <div class="metric"><span>Training Loss</span><strong>0.000</strong></div>
+              <div class="metric"><span>Test Loss</span><strong>0.007</strong></div>
+            </div>
+            <div class="result-copy">
+              <p><strong>What the result suggests:</strong> The output shows a circular decision region, with one class concentrated near the center and the other surrounding it. Both displayed losses were low.</p>
+              <p class="highlight"><strong>Key takeaway:</strong> Different datasets require different decision-boundary shapes. In this recorded run, the network represented the circular pattern successfully.</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="comparison">
+      <div class="section-heading">
+        <p class="section-kicker">06 · Results comparison</p>
+        <h2>All five recorded experiments</h2>
+        <p>Values are transcribed from the final visible state reported for each supplied recording.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <caption>Recorded values as reported in the presentation.</caption>
+          <thead>
+            <tr><th scope="col">Experiment</th><th scope="col">Main change</th><th scope="col">Epoch shown</th><th scope="col">Training Loss</th><th scope="col">Test Loss</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1. Baseline</td><td>XOR, 1 layer × 4</td><td>1,868</td><td>0.064</td><td>0.190</td></tr>
+            <tr><td>2. Noise</td><td>Noise = 30</td><td>1,870</td><td>0.075</td><td>0.210</td></tr>
+            <tr><td>3. Feature</td><td>Add x₁x₂</td><td>1,497</td><td>0.000</td><td>0.001</td></tr>
+            <tr><td>4. Depth</td><td>2 layers × 4</td><td>1,149</td><td>0.000</td><td>0.007</td></tr>
+            <tr><td>5. Circle</td><td>Circle dataset</td><td>1,192</td><td>0.000</td><td>0.007</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">
+        <strong>Lowest displayed Test Loss:</strong> Experiment 3 (0.001).
+        <strong>Highest displayed Test Loss:</strong> Experiment 2 (0.210).
+        Experiments 4 and 5 both showed Test Loss = 0.007.
+      </p>
+    </section>
+
+    <section id="interpretation">
+      <div class="section-heading">
+        <p class="section-kicker">07 · Reading the evidence</p>
+        <h2>What the five experiments suggest</h2>
+        <p>The results connect model settings to decision boundaries and generalization.</p>
+      </div>
+      <div class="concept-grid">
+        <article class="concept-card">
+          <h3>Noise matters</h3>
+          <p>Experiment 2 had higher Training and Test Loss than baseline. Noise can obscure the pattern and make classification harder.</p>
+        </article>
+        <article class="concept-card">
+          <h3>Features matter</h3>
+          <p>Adding x₁x₂ in Experiment 3 coincided with a large improvement in displayed loss. Feature representation can matter as much as network size.</p>
+        </article>
+        <article class="concept-card">
+          <h3>Depth is not always better</h3>
+          <p>Experiment 4 used more layers but Test Loss (0.007) was higher than Experiment 3 (0.001). Greater complexity does not guarantee better generalization.</p>
+        </article>
+      </div>
+      <article class="card top-gap">
+        <h3>Decision-boundary observations</h3>
+        <ul class="observation-list">
+          <li><strong>Baseline XOR:</strong> The output boundary was still imperfect at capture.</li>
+          <li><strong>Noisy XOR:</strong> Class regions were less clean and recorded losses were higher.</li>
+          <li><strong>Feature-augmented XOR:</strong> The output formed a clear four-quadrant pattern.</li>
+          <li><strong>Circle:</strong> The model learned a central region surrounded by the other class.</li>
+        </ul>
+      </article>
+      <p class="note">
+        Interpretations are limited to the settings and moments visible in the
+        recordings. Repeated trials may produce slightly different values.
+      </p>
+    </section>
+
+    <section id="method">
+      <div class="section-heading">
+        <p class="section-kicker">08 · Methodological limits</p>
+        <h2>How to interpret the results carefully</h2>
+        <p>A good experiment report distinguishes what the recording shows from what it does not show.</p>
+      </div>
+      <div class="interpret-grid">
+        <article class="interpret-card">
+          <h3>What the recordings directly show</h3>
+          <ul>
+            <li>Dataset and selected features</li>
+            <li>Noise slider setting</li>
+            <li>Hidden-layer and neuron counts</li>
+            <li>Epoch counter at capture</li>
+            <li>Training Loss and Test Loss at capture</li>
+          </ul>
+        </article>
+        <article class="interpret-card">
+          <h3>What cannot be concluded exactly</h3>
+          <ul>
+            <li>Actual wall-clock training duration</li>
+            <li>That one run proves a universal rule</li>
+            <li>That lower Training Loss always means better generalization</li>
+            <li>Exact causality when multiple settings differ</li>
+          </ul>
+        </article>
+      </div>
+      <p class="note">
+        <strong>Epoch counters and speed:</strong> Displayed counters differ
+        (1,149–1,870), but videos may have been stopped at different times. This
+        report gives the visible epoch values and does not claim one
+        configuration trained faster in real time. For a strict speed
+        comparison, run each configuration for the same number of epochs and
+        measure elapsed time under the same conditions.
+      </p>
+    </section>
+
+    <section id="takeaways">
+      <div class="section-heading">
+        <p class="section-kicker">09 · Summary</p>
+        <h2>Key takeaways</h2>
+        <p>Visualizing a neural network makes learning easier to understand.</p>
+      </div>
+      <div class="takeaway-grid">
+        <article class="takeaway-card">
+          <h3>Structure</h3>
+          <p>Layers organize processing. Neurons compute values, and weights control the strength of connections.</p>
+        </article>
+        <article class="takeaway-card">
+          <h3>Learning</h3>
+          <p>Tanh adds non-linearity. Loss measures error, and optimization updates the network's parameters.</p>
+        </article>
+        <article class="takeaway-card">
+          <h3>Experiment insight</h3>
+          <p>Useful features can improve learning. Noise can make it harder. More layers do not always improve test results.</p>
+        </article>
+      </div>
+      <p class="note">
+        <strong>The most important lesson:</strong> Model performance depends
+        on the relationship between the data, its features, and the network
+        architecture—not simply on making a network larger. A neural network
+        is not a black box: its behavior can be explored by changing one
+        component at a time and observing the result.
+      </p>
+    </section>
+
+    <section id="reflection">
+      <div class="section-heading">
+        <p class="section-kicker">10 · Personal reflection</p>
+        <h2>Learning by visualizing and experimenting</h2>
+      </div>
+      <div class="reflection">
+        <p>
+          Using TensorFlow Neural Network Playground helped me understand how a
+          neural network learns patterns from data. By changing noise, input
+          features, hidden layers, and dataset type, I could see how the
+          decision boundary and loss values changed.
+        </p>
+        <p>
+          The most surprising result was that adding the x₁x₂ feature greatly
+          reduced the loss in the XOR experiment, while adding another hidden
+          layer did not improve Test Loss further. This activity showed me that
+          choosing meaningful features and matching the model to the data are
+          important parts of machine learning.
+        </p>
+      </div>
+    </section>
+
+    <section id="evidence">
+      <div class="section-heading">
+        <p class="section-kicker">11 · Evidence & references</p>
+        <h2>Source material and interactive tool</h2>
+      </div>
+      <div class="overview-grid">
+        <article class="card">
+          <h3>Evidence included</h3>
+          <p>
+            One captured Playground screen from each of the five recordings is
+            embedded with its corresponding experiment. The screenshots show
+            settings, network structure, output map, and displayed loss values.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Reference</h3>
+          <p><a class="source-link" href="https://playground.tensorflow.org/" target="_blank" rel="noopener noreferrer">TensorFlow Neural Network Playground</a></p>
+          <p>The interactive tool used to conduct the five experiments.</p>
+          <p><a href="2.4_Portfolio_Visualizing_Neural_Networks.pptx">Download the visual presentation</a></p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Jingbin Wang · Workshop 2.4 · Visualizing Neural Networks</p>
+  </footer>
+</body>
+</html>
