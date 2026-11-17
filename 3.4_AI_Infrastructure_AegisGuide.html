@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AegisGuide: a proposed generative AI architecture for an organizational knowledge assistant, covering permission-aware RAG, operating costs, governance, and deployment risks.">
+  <title>AegisGuide — Generative AI Infrastructure: Architecture, Operating Costs &amp; Governance</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #172b45;
+      --navy-soft: #284564;
+      --teal: #167c78;
+      --mint: #e7f3f1;
+      --gold: #efb54a;
+      --ink: #25364a;
+      --muted: #607184;
+      --paper: #f3f6f8;
+      --line: #dce4ea;
+      --white: #fff;
+      --red: #a43f3f;
+      --red-bg: #fff1ef;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Arial, sans-serif;
+      line-height: 1.65;
+    }
+    a { color: var(--teal); }
+    a:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+    .hero {
+      padding: 58px 24px 62px;
+      background:
+        radial-gradient(ellipse at 86% 16%, #ffffff17, transparent 34%),
+        linear-gradient(135deg, var(--navy), var(--navy-soft));
+      color: var(--white);
+    }
+    .hero-content, main, .nav-content, footer {
+      width: min(1160px, 100%);
+      margin: 0 auto;
+    }
+    .home-link {
+      display: inline-block;
+      margin-bottom: 28px;
+      color: #e1eaf2;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+    .home-link:hover { color: var(--white); text-decoration: underline; }
+    .eyebrow {
+      margin: 0 0 12px;
+      color: #f4c96e;
+      font-size: 0.77rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      max-width: 930px;
+      margin: 0;
+      font-size: clamp(1.25rem, 3.2vw, 2.5rem);
+      line-height: 1.06;
+    }
+    .hero-lead {
+      max-width: 790px;
+      margin: 20px 0;
+      color: #e0e9f1;
+      font-size: 1.1rem;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px 20px;
+      margin: 22px 0 0;
+      color: #d2deea;
+      font-size: 0.91rem;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+    .button {
+      display: inline-block;
+      padding: 10px 16px;
+      border: 1px solid #ffffff66;
+      border-radius: 7px;
+      color: var(--white);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .button.primary { border-color: var(--gold); background: var(--gold); color: var(--navy); }
+    .button:hover { transform: translateY(-1px); }
+    nav {
+      position: sticky;
+      z-index: 3;
+      top: 0;
+      border-bottom: 1px solid var(--line);
+      background: #ffffffed;
+      backdrop-filter: blur(10px);
+    }
+    .nav-content { display: flex; gap: 6px; overflow-x: auto; padding: 10px 20px; }
+    nav a {
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      border-radius: 6px;
+      color: var(--navy);
+      font-size: 0.87rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    nav a:hover { background: #eaf0f4; }
+    main { padding: 32px 20px 20px; }
+    section {
+      margin-bottom: 24px;
+      padding: clamp(22px, 4vw, 35px);
+      border: 1px solid #e5ebef;
+      border-radius: 14px;
+      background: var(--white);
+      box-shadow: 0 5px 18px #172b450a;
+      scroll-margin-top: 74px;
+    }
+    .section-heading { margin-bottom: 20px; }
+    .section-kicker {
+      margin: 0 0 5px;
+      color: var(--teal);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    h2, h3 { color: var(--navy); line-height: 1.25; }
+    h2 { margin: 0; font-size: clamp(1.5rem, 3vw, 2rem); }
+    h3 { margin: 0 0 8px; font-size: 1.05rem; }
+    p { margin: 0 0 12px; }
+    p:last-child { margin-bottom: 0; }
+    .brief-grid, .context-grid, .role-grid, .gate-grid, .risk-grid {
+      display: grid;
+      gap: 14px;
+    }
+    .brief-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .context-grid { grid-template-columns: 1fr 1fr 1.2fr; }
+    .role-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .gate-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .risk-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .panel, .role-card, .gate-card, .risk-card {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f7f9fa;
+    }
+    .panel p, .role-card p, .gate-card p, .risk-card p { color: var(--muted); }
+    .panel.accent { border-top: 4px solid var(--teal); }
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      color: var(--teal);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .decision {
+      margin: 18px 0;
+      padding: 17px 19px;
+      border: 1px solid #efc9c4;
+      border-left: 5px solid var(--red);
+      border-radius: 8px;
+      background: var(--red-bg);
+      color: #653532;
+    }
+    .decision strong { color: #762f2f; }
+    .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+    .stat {
+      padding: 14px;
+      border-radius: 9px;
+      background: var(--navy);
+      color: var(--white);
+    }
+    .stat strong { display: block; color: #f4c96e; font-size: 1.35rem; }
+    .stat span { color: #d2deea; font-size: 0.82rem; }
+    .diagram-wrap {
+      overflow-x: auto;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #f7f9fa;
+    }
+    .architecture-diagram { display: block; width: min(100%, 1060px); height: auto; margin: auto; }
+    .diagram-note { margin-top: 12px; color: var(--muted); font-size: 0.88rem; text-align: center; }
+    .diagram-mobile { display: none; }
+    .guardrail {
+      margin-top: 15px;
+      padding: 13px 15px;
+      border-left: 4px solid var(--gold);
+      background: #fff8e9;
+      color: #564a34;
+      font-size: 0.93rem;
+    }
+    .guardrail strong { color: var(--navy); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    caption { padding: 0 0 11px; color: var(--muted); text-align: left; }
+    th, td { padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { background: #f1f5f7; color: var(--navy); font-size: 0.84rem; }
+    td:first-child { color: var(--navy); font-weight: 700; }
+    .risk-card { border-left: 4px solid #d59a45; }
+    .risk-card.critical { border-left-color: var(--red); }
+    .risk-card h3 { font-size: 0.98rem; }
+    .risk-card p { margin: 0; font-size: 0.91rem; }
+    .risk-card p + p { margin-top: 8px; }
+    .risk-card strong { color: var(--navy); }
+    .boundary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .boundary {
+      padding: 19px;
+      border-radius: 10px;
+      background: #eef7f6;
+    }
+    .boundary.no { background: #fff2ef; }
+    .boundary ul, .plain-list { margin: 0; padding-left: 20px; }
+    .boundary li + li, .plain-list li + li { margin-top: 6px; }
+    .boundary.no li::marker { color: var(--red); }
+    .checklist { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+    .checklist li {
+      padding: 12px 14px 12px 42px;
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fafb;
+    }
+    .checklist li::before {
+      content: attr(data-step);
+      position: absolute;
+      top: 11px;
+      left: 13px;
+      color: var(--teal);
+      font-size: 0.81rem;
+      font-weight: 700;
+    }
+    .owner { display: block; margin-top: 4px; color: var(--muted); font-size: 0.83rem; }
+    .small-note { margin-top: 13px; color: var(--muted); font-size: 0.86rem; }
+    footer { padding: 12px 20px 32px; color: var(--muted); font-size: 0.9rem; text-align: center; }
+    @media (max-width: 850px) {
+      .context-grid { grid-template-columns: 1fr 1fr; }
+      .context-grid .panel:last-child { grid-column: 1 / -1; }
+      .role-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 620px) {
+      .hero { padding: 45px 20px; }
+      .brief-grid, .context-grid, .role-grid, .gate-grid, .risk-grid, .boundary-grid {
+        grid-template-columns: 1fr;
+      }
+      .context-grid .panel:last-child { grid-column: auto; }
+      .stat-row { grid-template-columns: 1fr; }
+      .architecture-diagram { width: 840px; max-width: none; }
+      .diagram-wrap { padding: 8px; }
+      th, td { padding: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-content">
+      <a class="home-link" href="index.html">← Portfolio home</a>
+      <p class="eyebrow">Portfolio architecture brief · 3.4 AI Infrastructure</p>
+      <h1>AegisGuide — Generative AI Infrastructure: Architecture, Operating Costs &amp; Governance</h1>
+      <p class="hero-lead">
+        A one-page architecture brief for a fictional financial-services
+        organization — showing how governed internal knowledge could be searched,
+        cited, and summarized while keeping permissions, human review, and
+        deployment gates in the design.
+      </p>
+      <div class="hero-meta">
+        <span><strong>Jingbin Wang</strong></span>
+        <span>Indiana Wesleyan University</span>
+        <span>AIML-501-01R3A · November 2026</span>
+      </div>
+      <div class="hero-actions">
+        <a class="button primary" href="#brief">View architecture brief</a>
+        <a class="button" href="3.4_AI_Infrastructure_AegisGuide.docx">Download source brief</a>
+      </div>
+    </div>
+  </header>
+
+  <nav aria-label="Page sections">
+    <div class="nav-content">
+      <a href="#brief">One-page brief</a>
+      <a href="#architecture">Architecture diagram</a>
+      <a href="#operations">Operations</a>
+      <a href="#tradeoffs">Trade-offs</a>
+      <a href="#risks">Risks &amp; monitoring</a>
+      <a href="#boundaries">Boundaries</a>
+      <a href="#gates">Approval gates</a>
+      <a href="#decision">Decision</a>
+    </div>
+  </nav>
+
+  <main>
+    <section id="brief">
+      <div class="section-heading">
+        <p class="section-kicker">Architecture brief · Scenario C</p>
+        <h2>Organizational knowledge assistant for Aegis Financial Global</h2>
+        <p>
+          A proposed permission-aware retrieval-augmented generation (RAG)
+          service for finding and explaining approved internal policies.
+        </p>
+      </div>
+      <div class="context-grid">
+        <article class="panel">
+          <span class="label">Fictional organization</span>
+          <h3>Aegis Financial Global</h3>
+          <p>
+            A multinational financial-services and asset-management
+            organization with approximately 3,500 employees.
+          </p>
+        </article>
+        <article class="panel">
+          <span class="label">Problem to solve</span>
+          <h3>Fragmented, aging policy content</h3>
+          <p>
+            HR, benefits, compliance, IT security, and operating policies span
+            SharePoint, Confluence, and legacy drives. Some documents are
+            role-restricted.
+          </p>
+        </article>
+        <article class="panel">
+          <span class="label">Scenario indicators</span>
+          <h3>Search is costly and uncertain</h3>
+          <p>Scenario figures indicate more than 40% of source material is outdated or superseded and employees spend an estimated 4.5 hours per week searching or waiting for answers.</p>
+        </article>
+      </div>
+      <div class="stat-row" aria-label="Scenario indicators">
+        <div class="stat"><strong>~3,500</strong><span>employees in the fictional organization</span></div>
+        <div class="stat"><strong>&gt;40%</strong><span>source material reported outdated or superseded</span></div>
+        <div class="stat"><strong>4.5 hrs</strong><span>estimated weekly search/wait time per employee</span></div>
+      </div>
+      <div class="decision">
+        <strong>Decision status: CONDITIONAL — do not deploy with confidential or protected records yet.</strong>
+        Continue architecture design and a restricted proof of concept using
+        synthetic data or explicitly approved non-sensitive sources. Protected
+        content remains blocked until all required gates pass.
+      </div>
+      <div class="brief-grid">
+        <article class="panel accent">
+          <span class="label">Recommended approach</span>
+          <h3>Managed, permission-aware RAG</h3>
+          <p>
+            Use an approved managed enterprise cloud, corporate identity
+            provider, governed hybrid search/vector index, and enterprise LLM
+            API under reviewed contractual terms. The model synthesizes
+            retrieved evidence; it is not the authoritative policy store.
+            No fine-tuning or training from scratch is proposed.
+          </p>
+        </article>
+        <article class="panel">
+          <span class="label">Pilot boundary</span>
+          <h3>Non-sensitive content only</h3>
+          <p>
+            Consider a time-limited, restricted pilot only after security,
+            privacy, procurement, legal, and architecture reviews. If
+            approvals or access controls cannot be verified, retain
+            permission-filtered enterprise search and human support.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="architecture">
+      <div class="section-heading">
+        <p class="section-kicker">Architecture &amp; data flow</p>
+        <h2>Five stages, with authorization before generation</h2>
+        <p>
+          Only approved sources are indexed. Each request is filtered for the
+          authenticated user's document permissions before authorized passages
+          can reach the model API.
+        </p>
+      </div>
+      <div class="diagram-wrap">
+        <svg class="architecture-diagram" viewBox="0 0 1080 570" role="img" aria-labelledby="diagram-title diagram-desc">
+          <title id="diagram-title">AegisGuide permission-aware RAG architecture and feedback flow</title>
+          <desc id="diagram-desc">Five vertical stages: approved SharePoint, Confluence and legacy drive sources; ingestion with owner, version, effective date and classification validation, chunking and hybrid index; corporate SSO and IAM permission filtering before an approved enterprise LLM API; cited answer or abstention with human escalation; and audit, monitoring, user feedback and controlled re-indexing back to document owners.</desc>
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L9,3 z" fill="#607184"></path>
+            </marker>
+            <marker id="arrow-teal" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L9,3 z" fill="#167c78"></path>
+            </marker>
+          </defs>
+          <g font-family="Arial, sans-serif">
+            <g fill="#eaf1f4" stroke="#b8c7d1" stroke-width="2">
+              <rect x="20" y="52" width="180" height="210" rx="14"></rect>
+              <rect x="235" y="52" width="200" height="210" rx="14"></rect>
+              <rect x="470" y="52" width="200" height="210" rx="14"></rect>
+              <rect x="705" y="52" width="165" height="210" rx="14"></rect>
+              <rect x="905" y="52" width="155" height="210" rx="14"></rect>
+            </g>
+            <g fill="#172b45" font-size="15" font-weight="700" text-anchor="middle">
+              <text x="110" y="85">1 · APPROVED SOURCES</text>
+              <text x="335" y="85">2 · PREPARE + RETRIEVE</text>
+              <text x="570" y="85">3 · MODEL / API</text>
+              <text x="787" y="85">4 · ANSWER + REVIEW</text>
+              <text x="982" y="85">5 · MONITOR</text>
+            </g>
+            <g fill="#25364a" font-size="13" text-anchor="middle">
+              <text x="110" y="125"><tspan x="110">SharePoint</tspan><tspan x="110" dy="22">Confluence</tspan><tspan x="110" dy="22">Approved legacy drives</tspan><tspan x="110" dy="32">Owner-approved</tspan><tspan x="110" dy="19">canonical policies</tspan></text>
+              <text x="335" y="125"><tspan x="335">Validate owner, version,</tspan><tspan x="335" dy="19">effective date &amp; class</tspan><tspan x="335" dy="28">Clean, chunk, index</tspan><tspan x="335" dy="20">Hybrid search + vectors</tspan><tspan x="335" dy="30" fill="#167c78" font-weight="700">Filter by IAM permissions</tspan><tspan x="335" dy="19" fill="#167c78" font-weight="700">before model access</tspan></text>
+              <text x="570" y="135"><tspan x="570">Send only authorized</tspan><tspan x="570" dy="20">retrieved passages</tspan><tspan x="570" dy="32">Approved enterprise</tspan><tspan x="570" dy="20">LLM API</tspan><tspan x="570" dy="32">Grounded response</tspan><tspan x="570" dy="20">with citations—or abstain</tspan></text>
+              <text x="787" y="130"><tspan x="787">Answer links, version</tspan><tspan x="787" dy="20">&amp; effective dates</tspan><tspan x="787" dy="32">Sensitive, unclear, or</tspan><tspan x="787" dy="20">conflicting questions route</tspan><tspan x="787" dy="20">to HR / Legal / Compliance</tspan></text>
+              <text x="982" y="130"><tspan x="982">Approved audit</tspan><tspan x="982" dy="20">metadata + feedback</tspan><tspan x="982" dy="32">Quality, freshness,</tspan><tspan x="982" dy="20">access, latency, cost</tspan><tspan x="982" dy="32">Fix source &amp; re-index</tspan></text>
+            </g>
+            <g fill="none" stroke="#607184" stroke-width="3" marker-end="url(#arrow)">
+              <path d="M202 158 H228"></path><path d="M437 158 H463"></path>
+              <path d="M672 158 H698"></path><path d="M872 158 H898"></path>
+            </g>
+            <g fill="#e7f3f1" stroke="#167c78" stroke-width="2">
+              <rect x="240" y="325" width="180" height="78" rx="12"></rect>
+              <rect x="470" y="325" width="200" height="78" rx="12"></rect>
+              <rect x="720" y="325" width="165" height="78" rx="12"></rect>
+            </g>
+            <g fill="#172b45" font-size="13" font-weight="700" text-anchor="middle">
+              <text x="330" y="354"><tspan x="330">Corporate IdP / IAM</tspan><tspan x="330" dy="20">SSO · MFA · role/groups</tspan></text>
+              <text x="570" y="354"><tspan x="570">Policy check per request</tspan><tspan x="570" dy="20">cache + revocation aware</tspan></text>
+              <text x="802" y="354"><tspan x="802">Human owners decide</tspan><tspan x="802" dy="20">policy &amp; exceptions</tspan></text>
+            </g>
+            <g fill="none" stroke="#167c78" stroke-width="2.5" stroke-dasharray="7 6" marker-end="url(#arrow-teal)">
+              <path d="M330 321 V273"></path><path d="M570 321 V273"></path>
+              <path d="M802 273 V321"></path>
+              <path d="M982 272 C982 475 110 475 110 270"></path>
+            </g>
+            <g fill="#607184" font-size="12" font-style="italic">
+              <text x="105" y="457">Owner-approved corrections and source updates</text>
+              <text x="523" y="460">Feedback, audit signals, quality review, controlled re-index</text>
+              <text x="476" y="300">Authorization decision</text>
+              <text x="807" y="300">Escalation</text>
+            </g>
+            <rect x="18" y="505" width="1040" height="42" rx="9" fill="#fff8e9" stroke="#efb54a"></rect>
+            <text x="538" y="531" fill="#564a34" font-size="13" font-weight="700" text-anchor="middle">Security boundary: managed enterprise cloud · approved region · private/restricted network · no unauthenticated public endpoint</text>
+          </g>
+        </svg>
+      </div>
+      <p class="diagram-note">
+        Conceptual target architecture—not a deployed Aegis system. Dashed
+        arrows show identity checks, human escalation, and the monitored
+        feedback/re-index loop.
+      </p>
+      <p class="guardrail">
+        <strong>Critical design rule:</strong> Document-level authorization
+        happens in retrieval before any passage is sent to the model. A prompt
+        instruction is not an access-control mechanism.
+      </p>
+    </section>
+
+    <section id="operations">
+      <div class="section-heading">
+        <p class="section-kicker">Hosting, controls &amp; accountability</p>
+        <h2>Operating design for a restricted pilot</h2>
+      </div>
+      <div class="brief-grid">
+        <article class="panel accent">
+          <h3>Hosting &amp; dependencies</h3>
+          <ul class="plain-list">
+            <li>Use a managed enterprise cloud tenant selected through approved cloud and vendor processes.</li>
+            <li>Keep repositories, index, application services, secrets, logs, and network paths inside the approved security boundary and permitted regions.</li>
+            <li>Use managed app/API hosting, search/vector storage, key/secrets service, centralized logging/SIEM, and a contracted enterprise LLM API.</li>
+            <li>Keep endpoints private or equivalently restricted; do not expose unauthenticated public endpoints.</li>
+            <li>Choose provider, model, region, and service tier only after review; none are assumed approved.</li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h3>Identity &amp; data protection</h3>
+          <ul class="plain-list">
+            <li>Corporate SSO/MFA, authoritative role/group entitlements, least-privilege service identities.</li>
+            <li>Separate development, test, and production; use managed secrets and credential rotation.</li>
+            <li>Re-check access per request and after group, role, termination, or document-permission changes.</li>
+            <li>Scope caches and conversation history per user; invalidate restricted content after revocation.</li>
+            <li>Encrypt in transit and at rest; minimize prompt/passage retention and keep logs metadata-focused.</li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h3>Content governance &amp; freshness</h3>
+          <ul class="plain-list">
+            <li>Document owners confirm canonical status, classification, owner, version, approval, and effective date.</li>
+            <li>Quarantine superseded content; ingestion alone does not make a document authoritative.</li>
+            <li>Proposed pilot target: daily incremental indexing plus event-driven updates for critical policy changes.</li>
+            <li>Invalidate stale content and revoked access; maintain controlled re-indexing.</li>
+            <li>Use synthetic data or explicitly approved non-sensitive sources until reviews pass.</li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h3>Named ownership</h3>
+          <ul class="plain-list">
+            <li><strong>Document owners:</strong> approve sources and metadata.</li>
+            <li><strong>Data/AI Engineering:</strong> prepare and index content.</li>
+            <li><strong>IAM/Security:</strong> enforce authorization and monitor access.</li>
+            <li><strong>AI platform/service owner:</strong> manage endpoint, prompts, reliability, and operations.</li>
+            <li><strong>HR/Legal/Compliance:</strong> handle sensitive, conflicting, or high-impact questions.</li>
+            <li><strong>IT Operations/Security:</strong> service health, incidents, on-call, and rollback.</li>
+          </ul>
+        </article>
+      </div>
+      <p class="guardrail">
+        Negotiate no-training use of organizational inputs where available,
+        minimal provider-side retention, deletion/return commitments, and
+        approved subprocessors and data locations. Privacy, Legal, Records
+        Management, and Security must approve retention and contract terms
+        before launch.
+      </p>
+    </section>
+
+    <section id="tradeoffs">
+      <div class="section-heading">
+        <p class="section-kicker">Options &amp; trade-offs</p>
+        <h2>Why permission-aware RAG—and what it costs</h2>
+        <p>
+          RAG is a preferred target after approvals and tests, not an automatic
+          deployment decision. It does not eliminate hallucination or stale-source risk.
+        </p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <caption>Architecture alternatives from the brief.</caption>
+          <thead>
+            <tr><th scope="col">Option</th><th scope="col">Advantages</th><th scope="col">Trade-offs / appropriate use</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Prompt-only hosted model API</td>
+              <td>Fast prototype.</td>
+              <td>Weak freshness, grounding, and permission assurance. Non-sensitive demo only; not confidential policy use.</td>
+            </tr>
+            <tr>
+              <td>Permission-aware RAG + managed API</td>
+              <td>Current approved-source answers and citations if correctly implemented; pre-generation authorization; no need to operate GPU clusters initially.</td>
+              <td>More IAM, metadata, testing, and governance integration; variable API/indexing cost; vendor dependence, latency/availability, and data-processing terms. Preferred target only after approvals and tests.</td>
+            </tr>
+            <tr>
+              <td>Permission-filtered enterprise search</td>
+              <td>Lower generation risk and simpler operation; returns authorized links or snippets.</td>
+              <td>Employees still read and reconcile sources manually. Keep as the safe fallback or final choice if RAG controls cannot be proven.</td>
+            </tr>
+            <tr>
+              <td>Self-hosted model infrastructure</td>
+              <td>Potentially greater operational control in some environments.</td>
+              <td>GPU capital and specialist model-serving operations are not justified at this stage; reassess only with an approved need and capacity.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="guardrail">
+        Managed inference avoids large fixed GPU and model-training costs, but
+        still creates recurring API, storage, indexing, and cloud costs plus
+        governance, security, and content-cleanup effort. Start small and size
+        from measured concurrency, document volume, latency, and rate limits.
+      </p>
+      <div class="table-wrap" style="margin-top: 18px;">
+        <table>
+          <caption>Cost drivers and accountable owners.</caption>
+          <thead><tr><th scope="col">Area</th><th scope="col">Drivers</th><th scope="col">Accountable owner</th></tr></thead>
+          <tbody>
+            <tr><td>Model / API</td><td>Input/output tokens, volume, model tier, concurrency, retries, rate limits.</td><td>AI Platform/Product Owner; Finance reviews monthly.</td></tr>
+            <tr><td>Retrieval / storage</td><td>Document/chunk counts, embeddings, index replicas, storage, backups, re-indexing.</td><td>Data/AI Engineering with document owners.</td></tr>
+            <tr><td>Cloud operations</td><td>App hosting, egress/private networking, monitoring, secrets/keys, backup and recovery.</td><td>Cloud/Platform Operations.</td></tr>
+            <tr><td>Security / compliance</td><td>IAM, SIEM, testing, vendor review, privacy/legal review, audit and incident response.</td><td>CISO/Security, Privacy, Legal, Compliance.</td></tr>
+            <tr><td>People / change</td><td>Document cleanup, owner attestations, support training, review, evaluation, and tuning.</td><td>Service manager and business process owners.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small-note">
+        Establish quotas, budget alerts, and cost per successful grounded answer
+        before expansion. Assign one accountable service owner and named
+        business, engineering, cloud, IAM, security, privacy/legal, records,
+        support, and policy-owner roles.
+      </p>
+    </section>
+
+    <section id="risks">
+      <div class="section-heading">
+        <p class="section-kicker">Risk, trade-offs &amp; monitoring</p>
+        <h2>Controls must be observable and actionable</h2>
+        <p>
+          Each risk has a preventive control, a signal to monitor, and a
+          response path. Tune acceptance thresholds with accountable owners
+          before a pilot; no thresholds are assumed approved here.
+        </p>
+      </div>
+      <div class="risk-grid">
+        <article class="risk-card critical">
+          <h3>Unauthorized disclosure or IAM bypass</h3>
+          <p><strong>Control:</strong> Pre-retrieval document permissions, least privilege, per-request checks, per-user cache isolation, revocation tests.</p>
+          <p><strong>Monitor / respond:</strong> Authorization decisions, denied access, anomalous retrieval, and access incidents. Immediately disable generation after a confirmed leak or bypass.</p>
+        </article>
+        <article class="risk-card">
+          <h3>Stale, ownerless, or conflicting content</h3>
+          <p><strong>Control:</strong> Named source owners, canonical versions, effective dates, superseded-file quarantine, scheduled and event-driven re-indexing.</p>
+          <p><strong>Monitor / respond:</strong> Source age, version freshness, missing owner/approval metadata, conflicting results. Pause ingestion if ownership or authoritative status cannot be established.</p>
+        </article>
+        <article class="risk-card">
+          <h3>Unsupported answer or misleading citation</h3>
+          <p><strong>Control:</strong> Ground answers in authorized passages, cite source/version/date, abstain on missing or conflicting evidence, human escalation for sensitive questions.</p>
+          <p><strong>Monitor / respond:</strong> Groundedness, citation accuracy, unsupported-answer rate, abstention quality, user feedback, and weekly quality sampling. Roll back to search-only if approved thresholds are exceeded.</p>
+        </article>
+        <article class="risk-card">
+          <h3>Prompt injection or content misuse</h3>
+          <p><strong>Control:</strong> Treat retrieved text and prompts as untrusted input; never let content instructions override authorization or policy; conduct prompt-injection testing.</p>
+          <p><strong>Monitor / respond:</strong> Red-team results, suspicious access patterns, reported failures, unresolved vulnerabilities. Pause expansion after a serious incident or failed security test.</p>
+        </article>
+        <article class="risk-card">
+          <h3>Vendor, privacy, residency, and retention failure</h3>
+          <p><strong>Control:</strong> Vendor due diligence, approved regions/subprocessors, DPA and security terms, no-training terms where available, retention/deletion review.</p>
+          <p><strong>Monitor / respond:</strong> Contract/approval status, provider changes, data-location and retention evidence. Pause if terms or required approvals lapse or cannot be verified.</p>
+        </article>
+        <article class="risk-card">
+          <h3>Cost, latency, availability, and support burden</h3>
+          <p><strong>Control:</strong> Small pilot, quotas, budget alerts, measured capacity sizing, named service owner, on-call and tested disable/rollback switch.</p>
+          <p><strong>Monitor / respond:</strong> Availability, latency, errors, retries, token/cost per request and successful grounded answer. Reassess or retire if costs exceed approved value or operations cannot support it.</p>
+        </article>
+      </div>
+      <div class="brief-grid" style="margin-top: 16px;">
+        <article class="panel">
+          <h3>Operational telemetry</h3>
+          <p>Approved actor ID or pseudonym, timestamp, request ID, retrieved document IDs/versions, authorization result, model/API version, latency, token/cost usage, citation references, abstention/escalation, and administrative changes.</p>
+          <p>Protect logs and send them to approved SIEM/monitoring. Do not retain full sensitive prompts or passages unless explicitly approved.</p>
+        </article>
+        <article class="panel">
+          <h3>Review cadence &amp; incident readiness</h3>
+          <p>Weekly quality sampling; monthly cost review; ongoing service-health and access monitoring. Assign on-call ownership, severity levels, evidence preservation, escalation/notification paths, vendor-notification duties, and a tested rollback/disable switch.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="boundaries">
+      <div class="section-heading">
+        <p class="section-kicker">System boundaries &amp; human oversight</p>
+        <h2>Informational assistance—not decision automation</h2>
+      </div>
+      <div class="boundary-grid">
+        <article class="boundary">
+          <h3>The system may</h3>
+          <ul>
+            <li>Search approved internal policy sources the authenticated user is authorized to access.</li>
+            <li>Summarize retrieved passages and provide source title, section, version/effective date, and links.</li>
+            <li>Identify missing, stale, contradictory, or low-confidence evidence and abstain or route the question.</li>
+            <li>Help employees find the correct HR, IT, Compliance, or policy owner.</li>
+            <li>Collect limited, approved feedback for quality monitoring and retrieval improvement.</li>
+          </ul>
+        </article>
+        <article class="boundary no">
+          <h3>The system must not</h3>
+          <ul>
+            <li>Make legal, compliance, investment, credit, employment, or consequential benefits-eligibility decisions.</li>
+            <li>Approve exceptions, waive controls, or take actions for HR, Legal, Compliance, or management.</li>
+            <li>Reveal restricted content or sensitive metadata to unauthorized users.</li>
+            <li>Present unapproved, superseded, or unverified sources as authoritative.</li>
+            <li>Train a vendor model on Aegis content without separate review, explicit authorization, and contract approval.</li>
+          </ul>
+        </article>
+      </div>
+      <p class="guardrail">
+        HR, Legal, Compliance, and document owners remain accountable for
+        policy interpretation, exceptions, conflicting rules, and high-impact
+        questions. Employees should follow cited official procedures or
+        contact the responsible team when uncertain.
+      </p>
+    </section>
+
+    <section id="gates">
+      <div class="section-heading">
+        <p class="section-kicker">Approvals &amp; implementation gates</p>
+        <h2>Evidence required before expanding the pilot</h2>
+        <p>
+          Technical feasibility is not legal permission. These are proposed
+          acceptance gates, not approvals already obtained.
+        </p>
+      </div>
+      <ol class="checklist">
+        <li data-step="01">
+          <strong>Source readiness</strong> — named owners, canonical versions,
+          approval/effective-date metadata, and superseded files quarantined.
+          <span class="owner">Decision owners: Business document owners / Records Management</span>
+        </li>
+        <li data-step="02">
+          <strong>Architecture &amp; vendor</strong> — approved cloud region,
+          model/API, vendor assessment, data-flow map, contract, and DPA.
+          <span class="owner">Decision owners: Enterprise Architecture / Procurement / Security / Legal</span>
+        </li>
+        <li data-step="03">
+          <strong>Privacy &amp; legal</strong> — data classification, permitted
+          purpose, privacy impact assessment, cross-border and retention review.
+          <span class="owner">Decision owners: Privacy Officer / Legal / Compliance</span>
+        </li>
+        <li data-step="04">
+          <strong>Identity &amp; security</strong> — SSO/MFA, least privilege,
+          pre-retrieval authorization, revocation/cache tests, penetration and
+          prompt-injection tests.
+          <span class="owner">Decision owners: IAM / CISO / Security Engineering</span>
+        </li>
+        <li data-step="05">
+          <strong>Quality &amp; operations</strong> — held-out evaluation,
+          citation/freshness thresholds, monitoring, support/on-call, incident
+          and rollback drills.
+          <span class="owner">Decision owners: AI Service Owner / Business Owners / IT Operations</span>
+        </li>
+        <li data-step="06">
+          <strong>Pilot authorization</strong> — written sign-off, restricted
+          user group, non-sensitive scope, user notice, metrics, review date,
+          and kill switch.
+          <span class="owner">Decision owners: AI Governance / Executive Sponsor</span>
+        </li>
+      </ol>
+      <p class="guardrail">
+        Before protected, personal, confidential, regulated, employee, client,
+        or investment-related records are processed, document classification
+        and purpose, privacy and legal review, vendor/subprocessor due
+        diligence, contract terms, AI governance, records/e-discovery, and
+        cross-border/data-residency approvals. Until then, use synthetic data
+        or explicitly approved non-sensitive documents in an isolated test
+        environment—not a public or unreviewed AI service.
+      </p>
+    </section>
+
+    <section id="decision">
+      <div class="section-heading">
+        <p class="section-kicker">Round 4 decision record · Proposed</p>
+        <h2>Proceed in stages; keep a safe fallback</h2>
+      </div>
+      <div class="brief-grid">
+        <article class="panel accent">
+          <span class="label">Recommended next step</span>
+          <h3>Restricted proof of concept</h3>
+          <p>
+            Continue architecture design using synthetic data or explicitly
+            approved non-sensitive sources. Keep the user group restricted,
+            document the use purpose, define metrics and review date, and
+            rehearse pause/rollback.
+          </p>
+        </article>
+        <article class="panel">
+          <span class="label">Do not expand until</span>
+          <h3>Approvals and tests are evidenced</h3>
+          <p>
+            Do not connect confidential employee, client, legal, compliance,
+            or security repositories until required approvals and independent
+            security tests pass and representative accuracy, freshness,
+            citation, and role-based access tests meet approved thresholds.
+          </p>
+        </article>
+      </div>
+      <div class="decision">
+        <strong>Fallback:</strong> If RAG controls cannot be proven, required
+        terms/approvals are missing, or quality and monitoring cannot be
+        supported, retain permission-filtered enterprise search and human
+        support instead of deploying generated answers.
+      </div>
+      <h3>Pause, rollback, or retire when</h3>
+      <ul class="plain-list">
+        <li>Any confirmed unauthorized disclosure, IAM bypass, or exposure of restricted content/metadata occurs: immediately disable generation.</li>
+        <li>Unsupported answers, materially incorrect citations, or stale-source retrieval exceed approved thresholds: roll back to search-only, especially for high-risk topics.</li>
+        <li>More than half of the relevant corpus is ownerless, contradictory, or unreliable, or a source lacks owner/approval/version/effective date: pause ingestion.</li>
+        <li>Vendor terms, data residency, retention, security assurances, or legal/privacy approvals lapse; a serious incident, unresolved vulnerability, failed test, or ineffective revocation occurs: pause expansion.</li>
+        <li>Critical failures persist, the vendor cannot meet requirements, operating cost exceeds approved value, or a safer approved alternative emerges: retire or replace the service.</li>
+      </ul>
+    </section>
+
+    <section id="assumptions">
+      <div class="section-heading">
+        <p class="section-kicker">Source and assumption note</p>
+        <h2>Scenario facts, recommendations, and data use</h2>
+      </div>
+      <div class="brief-grid">
+        <article class="panel">
+          <h3>Scenario facts</h3>
+          <p>
+            Aegis Financial Global, its approximately 3,500 employees,
+            fragmented repositories, outdated-content estimate, role
+            restrictions, and search-time estimate are carried forward from
+            the fictional AegisGuide scenario. The earlier team recommendation
+            was permission-aware RAG preceded by source cleanup and metadata
+            governance.
+          </p>
+        </article>
+        <article class="panel">
+          <h3>Proposals, not completed work</h3>
+          <p>
+            Hosting pattern, controls, cost drivers, acceptance gates, and
+            conditional deployment decision are recommendations—not claims
+            Aegis has purchased, configured, or approved these services. No
+            measured Round 4 scorecard was supplied.
+          </p>
+        </article>
+      </div>
+      <p class="small-note">
+        This is a fictional architecture exercise. No real employee, customer,
+        financial, legal, or other protected data was used or generated in
+        preparing the brief.
+      </p>
+      <p class="small-note">
+        <a href="3.4_AI_Infrastructure_AegisGuide.docx">Download the original AegisGuide architecture brief</a>
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Jingbin Wang · AegisGuide Architecture Brief · AIML-501-01R3A</p>
+  </footer>
+</body>
+</html>

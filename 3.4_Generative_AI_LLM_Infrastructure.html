@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Jingbin Wang's portfolio presentation on generative AI and large language model infrastructure, training processes, energy, time, and cost.">
+  <title>Generative AI &amp; LLM Infrastructure | Jingbin Wang</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #172b45;
+      --navy-soft: #284564;
+      --teal: #167c78;
+      --mint: #dcefeb;
+      --gold: #efb54a;
+      --ink: #25364a;
+      --muted: #607184;
+      --paper: #f3f6f8;
+      --line: #dce4ea;
+      --white: #fff;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Arial, sans-serif;
+      line-height: 1.65;
+    }
+    a { color: var(--teal); }
+    a:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+    .hero {
+      padding: 62px 24px 64px;
+      background:
+        radial-gradient(ellipse at 87% 14%, #ffffff17, transparent 34%),
+        linear-gradient(135deg, var(--navy), var(--navy-soft));
+      color: var(--white);
+    }
+    .hero-content, main, .nav-content, footer {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+    .home-link {
+      display: inline-block;
+      margin-bottom: 30px;
+      color: #e1eaf2;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+    .home-link:hover { color: var(--white); text-decoration: underline; }
+    .eyebrow {
+      margin: 0 0 12px;
+      color: #f4c96e;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      max-width: 900px;
+      margin: 0;
+      font-size: clamp(2.2rem, 5.2vw, 4rem);
+      line-height: 1.08;
+    }
+    .hero-lead {
+      max-width: 760px;
+      margin: 20px 0;
+      color: #e0e9f1;
+      font-size: 1.12rem;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      margin: 23px 0 0;
+      color: #d2deea;
+      font-size: 0.92rem;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 27px; }
+    .button {
+      display: inline-block;
+      padding: 10px 16px;
+      border: 1px solid #ffffff66;
+      border-radius: 7px;
+      color: var(--white);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .button.primary { border-color: var(--gold); background: var(--gold); color: var(--navy); }
+    .button:hover { transform: translateY(-1px); }
+    nav {
+      position: sticky;
+      z-index: 3;
+      top: 0;
+      border-bottom: 1px solid var(--line);
+      background: #ffffffed;
+      backdrop-filter: blur(10px);
+    }
+    .nav-content { display: flex; gap: 6px; overflow-x: auto; padding: 10px 20px; }
+    nav a {
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      border-radius: 6px;
+      color: var(--navy);
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    nav a:hover { background: #eaf0f4; }
+    main { padding: 34px 20px 20px; }
+    section {
+      margin-bottom: 25px;
+      padding: clamp(22px, 4vw, 36px);
+      border: 1px solid #e5ebef;
+      border-radius: 14px;
+      background: var(--white);
+      box-shadow: 0 5px 18px #172b450a;
+      scroll-margin-top: 74px;
+    }
+    .section-heading { margin-bottom: 21px; }
+    .section-kicker {
+      margin: 0 0 5px;
+      color: var(--teal);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    h2, h3 { color: var(--navy); line-height: 1.25; }
+    h2 { margin: 0; font-size: clamp(1.55rem, 3vw, 2rem); }
+    h3 { margin: 0 0 9px; font-size: 1.08rem; }
+    p { margin: 0 0 13px; }
+    p:last-child { margin-bottom: 0; }
+    .about-grid, .project-grid, .pipeline-grid, .infra-grid,
+    .model-grid, .skills-grid, .source-grid {
+      display: grid;
+      gap: 15px;
+    }
+    .about-grid { grid-template-columns: 1.4fr 0.8fr; }
+    .project-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .pipeline-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .infra-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .model-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .skills-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .source-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .panel, .step, .infra-card, .model-card, .skill-card, .source-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f7f9fa;
+    }
+    .panel, .step, .infra-card, .model-card, .skill-card, .source-card { padding: 18px; }
+    .panel p, .step p, .infra-card p, .model-card p, .skill-card p, .source-card p {
+      color: var(--muted);
+    }
+    .panel.accent { border-top: 4px solid var(--teal); }
+    .panel.tint { background: #eef7f6; }
+    .label {
+      display: inline-block;
+      margin-bottom: 9px;
+      color: var(--teal);
+      font-size: 0.73rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .step-number {
+      display: inline-grid;
+      width: 30px;
+      height: 30px;
+      margin-bottom: 10px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--navy);
+      color: var(--white);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    .step h3, .infra-card h3, .model-card h3, .skill-card h3 { font-size: 1rem; }
+    .flow {
+      overflow-x: auto;
+      margin-bottom: 16px;
+      padding: 14px;
+      border-radius: 10px;
+      background: var(--navy);
+      color: var(--white);
+    }
+    .flow ol {
+      display: flex;
+      min-width: 740px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .flow li { display: flex; align-items: center; gap: 8px; font-size: 0.86rem; font-weight: 700; }
+    .flow li:not(:last-child)::after { content: "→"; margin-left: 6px; color: var(--gold); font-size: 1.2rem; }
+    .flow b {
+      display: inline-grid;
+      width: 25px;
+      height: 25px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--gold);
+      color: var(--navy);
+      font-size: 0.76rem;
+    }
+    .learning-loop {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      counter-reset: loop;
+    }
+    .loop-step {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #f7f9fa;
+      counter-increment: loop;
+    }
+    .loop-step::before {
+      content: "0" counter(loop);
+      display: block;
+      margin-bottom: 8px;
+      color: var(--teal);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+    .loop-step strong { display: block; color: var(--navy); }
+    .loop-step span { color: var(--muted); font-size: 0.85rem; }
+    .formula {
+      margin-top: 15px;
+      padding: 16px;
+      border-left: 4px solid var(--gold);
+      border-radius: 5px;
+      background: #fff8e9;
+      color: #564a34;
+      font-weight: 700;
+      text-align: center;
+    }
+    .model-card { display: flex; flex-direction: column; }
+    .model-card .model-body { flex: 1; }
+    .model-card .model-caveat {
+      margin-top: 12px;
+      padding-top: 11px;
+      border-top: 1px solid var(--line);
+      color: #46596c;
+      font-size: 0.89rem;
+    }
+    .metric {
+      margin: 9px 0;
+      padding: 10px 12px;
+      border-radius: 7px;
+      background: var(--navy);
+      color: var(--white);
+      font-size: 0.91rem;
+    }
+    .metric strong { color: #f4c96e; }
+    .callout {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--gold);
+      background: #fff8e9;
+      color: #564a34;
+      font-size: 0.93rem;
+    }
+    .callout strong { color: var(--navy); }
+    .takeaway-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 22px; margin: 0; padding: 0; list-style: none; }
+    .takeaway-list li { position: relative; padding: 2px 0 2px 23px; }
+    .takeaway-list li::before { content: "✓"; position: absolute; left: 0; color: var(--teal); font-weight: 700; }
+    .skill-card ul { margin: 0; padding-left: 19px; color: var(--muted); }
+    .skill-card li + li { margin-top: 4px; }
+    .source-card { display: flex; flex-direction: column; gap: 5px; }
+    .source-card a { font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    .source-card span { color: var(--muted); font-size: 0.88rem; }
+    .small-note { margin-top: 14px; color: var(--muted); font-size: 0.86rem; }
+    footer { padding: 12px 20px 32px; color: var(--muted); font-size: 0.9rem; text-align: center; }
+    @media (max-width: 850px) {
+      .pipeline-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .infra-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .model-grid { grid-template-columns: 1fr; }
+      .model-card { display: block; }
+    }
+    @media (max-width: 640px) {
+      .hero { padding: 48px 20px; }
+      .about-grid, .project-grid, .skills-grid, .source-grid, .takeaway-list {
+        grid-template-columns: 1fr;
+      }
+      .infra-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .learning-loop { grid-template-columns: 1fr; }
+      .loop-step { display: grid; grid-template-columns: 48px 1fr; gap: 0 10px; align-items: center; }
+      .loop-step::before { grid-row: span 2; margin: 0; }
+    }
+    @media (max-width: 420px) {
+      .pipeline-grid, .infra-grid { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-content">
+      <a class="home-link" href="index.html">← Portfolio home</a>
+      <p class="eyebrow">Portfolio presentation · Generative AI · LLM systems</p>
+      <h1>Generative AI &amp; LLM Infrastructure</h1>
+      <p class="hero-lead">
+        From raw data to a deployed assistant: explore the training pipeline,
+        infrastructure, energy, time, and costs behind large language models.
+        A practical, evidence-led overview using GPT-4, Llama 3.1 405B, and DeepSeek-V3.
+      </p>
+      <div class="hero-meta">
+        <span><strong>Jingbin Wang</strong></span>
+        <span>Generative AI · Model Development</span>
+        <span>Presentation date: November 14, 2026</span>
+      </div>
+      <div class="hero-actions">
+        <a class="button" href="3.4%20Generative_AI_LLM_Infrastructure.pptx">Download the presentation</a>
+      </div>
+    </div>
+  </header>
+
+  <nav aria-label="Page sections">
+    <div class="nav-content">
+      <a href="#about">About me</a>
+      <a href="#project">Work samples</a>
+      <a href="#skills">Skills</a>
+      <a href="#lifecycle">LLM lifecycle</a>
+      <a href="#learning">Training loop</a>
+      <a href="#infrastructure">Infrastructure</a>
+      <a href="#examples">Model examples</a>
+      <a href="#costs">Cost &amp; time</a>
+      <a href="#sources">Sources</a>
+    </div>
+  </nav>
+
+  <main>
+    <section id="about">
+      <div class="section-heading">
+        <p class="section-kicker">About me</p>
+        <h2>Building toward responsible, practical AI</h2>
+      </div>
+      <div class="about-grid">
+        <article class="panel accent">
+          <p>
+            I’m Jingbin Wang, an AI and machine learning student focused on
+            understanding how models are developed and brought into real-world
+            use. My career goal is to contribute to the development of useful,
+            reliable AI systems and continue growing my expertise in generative
+            AI, model development, and data science.
+          </p>
+          <p>
+            My strength is connecting the parts of a complex system. I look
+            beyond model architecture to consider data quality, compute,
+            infrastructure, energy, evaluation, safety, and deployment—and
+            communicate those relationships in a clear, evidence-led way.
+          </p>
+        </article>
+        <aside class="panel tint">
+          <span class="label">How I approach AI</span>
+          <h3>Systems thinking, careful evidence</h3>
+          <p>
+            Strong AI is not just a model. It is the outcome of people, data,
+            hardware, software, evaluation, and ongoing operations working
+            together.
+          </p>
+        </aside>
+      </div>
+    </section>
+
+    <section id="project">
+      <div class="section-heading">
+        <p class="section-kicker">Work samples</p>
+        <h2>Work Samples &amp; Project Descriptions</h2>
+        <h3 class="project-title">Generative AI LLM Infrastructure</h3>
+        <p>
+          A presentation tracing a large language model from source data
+          through training and alignment to deployment, with a comparative
+          look at published compute, emissions, and cost information.
+        </p>
+      </div>
+      <div class="project-grid">
+        <article class="panel">
+          <span class="label">Context</span>
+          <h3>Why this topic matters</h3>
+          <p>
+            Modern language models are often discussed in terms of parameters
+            or model capability alone. This project examines the larger
+            production system required to prepare data, train a model, evaluate
+            it, and serve it to users.
+          </p>
+        </article>
+        <article class="panel">
+          <span class="label">Challenge</span>
+          <h3>Comparing incomplete disclosures</h3>
+          <p>
+            Public cost and resource claims use different hardware, accounting
+            boundaries, and definitions of “training cost.” A GPU-hour is
+            accelerator time—not a universal price tag—and reported figures
+            do not reveal every cost.
+          </p>
+        </article>
+        <article class="panel">
+          <span class="label">Approach &amp; solution</span>
+          <h3>Make the lifecycle and caveats visible</h3>
+          <p>
+            I organized the subject into a seven-stage pipeline and a
+            data-to-deployment resource stack, then compared GPT-4, Llama 3.1
+            405B, and DeepSeek-V3 using clearly labeled reported facts and
+            disclosure limits.
+          </p>
+        </article>
+      </div>
+      <p class="callout">
+        <strong>Project outcome:</strong> A practical framework for explaining
+        how pretraining, post-training, infrastructure, energy, evaluation,
+        and deployment fit together—and why model cost claims need a clearly
+        defined scope.
+      </p>
+    </section>
+
+    <section id="skills">
+      <div class="section-heading">
+        <p class="section-kicker">Skills &amp; technologies</p>
+        <h2>Key skills and relevant technologies in this project</h2>
+        <p>
+          These are subject-matter skills and technologies explored in this
+          presentation—not claims of production implementation experience.
+        </p>
+      </div>
+      <div class="skills-grid">
+        <article class="skill-card">
+          <h3>AI &amp; model development</h3>
+          <ul>
+            <li>Generative AI and large language model lifecycle</li>
+            <li>Transformer architecture and next-token prediction</li>
+            <li>Pretraining, supervised post-training, and RLHF</li>
+            <li>Tokenization, loss, backpropagation, and optimization</li>
+          </ul>
+        </article>
+        <article class="skill-card">
+          <h3>Infrastructure &amp; responsible AI</h3>
+          <ul>
+            <li>GPU accelerators, distributed training, and GPU-hours</li>
+            <li>High-bandwidth networking, storage, and reliability</li>
+            <li>Compute cost, energy use, and emissions boundaries</li>
+            <li>Model evaluation, red-teaming, privacy, and monitoring</li>
+          </ul>
+        </article>
+        <article class="skill-card">
+          <h3>Analysis &amp; communication</h3>
+          <ul>
+            <li>Comparing technical disclosures and evidence</li>
+            <li>Identifying accounting scope and limitations</li>
+            <li>Systems thinking across data, models, and operations</li>
+            <li>Translating complex material into a clear presentation</li>
+          </ul>
+        </article>
+        <article class="skill-card">
+          <h3>Models &amp; hardware referenced</h3>
+          <ul>
+            <li>GPT-4, Llama 3.1 405B, and DeepSeek-V3</li>
+            <li>NVIDIA H100 and H800 accelerators</li>
+            <li>Transformer, attention, and RLHF concepts</li>
+            <li>GPU-hours and location-based tCO₂e reporting</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="lifecycle">
+      <div class="section-heading">
+        <p class="section-kicker">01 · Lifecycle</p>
+        <h2>The LLM training pipeline</h2>
+        <p>
+          A foundation model is built in stages; each stage changes what the
+          system knows, how it behaves, and whether it is ready to serve.
+        </p>
+      </div>
+      <div class="flow" aria-label="Seven-stage language model lifecycle">
+        <ol>
+          <li><b>1</b>Collect</li><li><b>2</b>Clean</li><li><b>3</b>Tokenize</li>
+          <li><b>4</b>Pretrain</li><li><b>5</b>Post-train</li>
+          <li><b>6</b>Evaluate</li><li><b>7</b>Deploy</li>
+        </ol>
+      </div>
+      <div class="pipeline-grid">
+        <article class="step">
+          <span class="step-number">1</span>
+          <h3>Collect &amp; license</h3>
+          <p>Web, books, code, documents, and partner data; define rights, privacy, and provenance.</p>
+        </article>
+        <article class="step">
+          <span class="step-number">2</span>
+          <h3>Clean &amp; prepare</h3>
+          <p>Filter spam and unsafe material; deduplicate, balance domains and languages, and remove sensitive data.</p>
+        </article>
+        <article class="step">
+          <span class="step-number">3</span>
+          <h3>Tokenize</h3>
+          <p>Convert text into tokens, pack sequences, and build training batches.</p>
+        </article>
+        <article class="step">
+          <span class="step-number">4</span>
+          <h3>Pretrain</h3>
+          <p>A Transformer predicts the next token; backpropagation updates billions of parameters.</p>
+        </article>
+        <article class="step">
+          <span class="step-number">5</span>
+          <h3>Post-train</h3>
+          <p>Supervised examples plus preference optimization or RLHF shape instruction following and helpfulness.</p>
+        </article>
+        <article class="step">
+          <span class="step-number">6</span>
+          <h3>Evaluate &amp; red-team</h3>
+          <p>Benchmark quality, bias, robustness, privacy, and misuse; iterate or block release.</p>
+        </article>
+        <article class="step">
+          <span class="step-number">7</span>
+          <h3>Deploy &amp; monitor</h3>
+          <p>Serve on GPUs or other accelerators; optimize latency and cost; monitor abuse, drift, and failures.</p>
+        </article>
+      </div>
+      <p class="callout">
+        <strong>Key distinction:</strong> Pretraining builds broad statistical
+        capability; post-training steers that capability into an assistant.
+        Deployment is a separate, ongoing engineering and operations problem.
+      </p>
+    </section>
+
+    <section id="learning">
+      <div class="section-heading">
+        <p class="section-kicker">02 · Learning loop</p>
+        <h2>What happens during pretraining?</h2>
+        <p>
+          The model is not storing a library of answers. It learns statistical
+          patterns in token sequences by repeatedly predicting what comes next.
+        </p>
+      </div>
+      <div class="learning-loop">
+        <article class="loop-step">
+          <strong>Input tokens</strong>
+          <span>“The cat sat on the …” Tokenizer maps text into token IDs; context is represented as vectors.</span>
+        </article>
+        <article class="loop-step">
+          <strong>Transformer</strong>
+          <span>Attention and layers process each token in context; parameters encode learned patterns.</span>
+        </article>
+        <article class="loop-step">
+          <strong>Prediction</strong>
+          <span>A probability distribution is produced for the next token, such as “mat” or “floor.”</span>
+        </article>
+        <article class="loop-step">
+          <strong>Compare with target</strong>
+          <span>Compare the prediction with the real next token and compute prediction error (loss).</span>
+        </article>
+        <article class="loop-step">
+          <strong>Update model weights</strong>
+          <span>Backpropagation and an optimizer update weights; repeat at scale.</span>
+        </article>
+      </div>
+      <p class="formula">
+        Billions of training examples × many optimization steps → a model
+        that generalizes beyond the exact sentences it saw.
+      </p>
+    </section>
+
+    <section id="infrastructure">
+      <div class="section-heading">
+        <p class="section-kicker">03 · Infrastructure</p>
+        <h2>The resource stack: more than GPUs</h2>
+        <p>
+          Quality and cost depend on the interaction between data, hardware,
+          people, software, energy, and elapsed time.
+        </p>
+      </div>
+      <div class="infra-grid">
+        <article class="infra-card">
+          <span class="label">Data</span>
+          <h3>Quality &amp; provenance</h3>
+          <p>High-quality, diverse, legally usable corpora; deduplication, filtering, annotation, and synthetic examples.</p>
+        </article>
+        <article class="infra-card">
+          <span class="label">Compute</span>
+          <h3>Distributed hardware</h3>
+          <p>Thousands of accelerators, high-bandwidth networking, fast storage, and distributed training software.</p>
+        </article>
+        <article class="infra-card">
+          <span class="label">Energy &amp; facilities</span>
+          <h3>Power and cooling</h3>
+          <p>Electricity for chips plus cooling, networking, and power conversion; carbon intensity varies by grid.</p>
+        </article>
+        <article class="infra-card">
+          <span class="label">Time &amp; reliability</span>
+          <h3>Long-running jobs</h3>
+          <p>Large runs last weeks or months; failures, checkpointing, evaluation, and restarts add overhead.</p>
+        </article>
+        <article class="infra-card">
+          <span class="label">People &amp; operations</span>
+          <h3>Cross-functional teams</h3>
+          <p>Research, data engineering, infrastructure, safety, evaluation, security, and product teams.</p>
+        </article>
+      </div>
+      <p class="callout">
+        <strong>Total cost extends beyond the final run:</strong> R&amp;D
+        experiments, data acquisition, staff, infrastructure, safety work,
+        and inference all matter.
+      </p>
+    </section>
+
+    <section id="examples">
+      <div class="section-heading">
+        <p class="section-kicker">04 · Published examples</p>
+        <h2>Three models, three disclosure stories</h2>
+        <p>
+          Reported figures are not perfectly comparable: hardware, accounting
+          boundaries, and what counts as “training cost” differ.
+        </p>
+      </div>
+      <div class="model-grid">
+        <article class="model-card">
+          <span class="label">Limited technical disclosure</span>
+          <h3>GPT-4 <span aria-hidden="true">·</span> OpenAI</h3>
+          <div class="model-body">
+            <p><strong>What is known:</strong> Transformer; pretrained on public and licensed data; post-trained with RLHF.</p>
+            <p><strong>What is not public:</strong> Model size, hardware, training compute, dataset construction, and training cost.</p>
+          </div>
+          <p class="model-caveat"><strong>Interpretation:</strong> A high-profile example of limited technical disclosure.</p>
+        </article>
+        <article class="model-card">
+          <span class="label">Reported compute &amp; emissions</span>
+          <h3>Llama 3.1 405B <span aria-hidden="true">·</span> Meta</h3>
+          <div class="model-body">
+            <p><strong>Data:</strong> Over 15 trillion tokens; 405B parameters.</p>
+            <p><strong>Compute:</strong> 30.84 million H100 GPU-hours; trained using more than 16,000 H100 GPUs.</p>
+            <p><strong>Energy / emissions:</strong> Meta reports 8,930 tCO₂e location-based emissions for the 405B run.</p>
+          </div>
+        </article>
+        <article class="model-card">
+          <span class="label">Reported compute &amp; cost estimate</span>
+          <h3>DeepSeek-V3 <span aria-hidden="true">·</span> DeepSeek</h3>
+          <div class="model-body">
+            <p><strong>Data:</strong> 14.8 trillion tokens; 671B total / 37B active parameters.</p>
+            <p><strong>Compute &amp; time:</strong> 2.788 million H800 GPU-hours; pretraining took less than two months on 2,048 GPUs.</p>
+            <p><strong>Cost estimate:</strong> $5.576M at an assumed $2/H800-hour; excludes prior R&amp;D and ablations.</p>
+          </div>
+          <p class="model-caveat">The dollar figure is an accelerator-rental estimate for the official run—not the full cost to invent, build, and operate the model.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="costs">
+      <div class="section-heading">
+        <p class="section-kicker">05 · Interpreting the numbers</p>
+        <h2>Why training cost is hard to compare</h2>
+        <p>
+          A GPU-hour is a unit of accelerator time—not a universal price tag.
+          The true bill depends on chip, utilization, cloud versus owned
+          hardware, and scope.
+        </p>
+      </div>
+      <p class="formula">
+        Training compute cost ≈ accelerator-hours × effective $/hour
+      </p>
+      <p>
+        Then add: data + storage/network + power/cooling + staff + experiments
+        + evaluation + safety + operations.
+      </p>
+      <div class="project-grid">
+        <article class="panel">
+          <span class="label">Disclosed compute</span>
+          <h3>DeepSeek-V3</h3>
+          <p>2.788M H800 GPU-hours</p>
+          <p class="metric"><strong>$5.576M</strong> at $2/GPU-hour</p>
+        </article>
+        <article class="panel">
+          <span class="label">Disclosed emissions</span>
+          <h3>Llama 3.1 405B</h3>
+          <p class="metric"><strong>8,930 tCO₂e</strong><br>Location-based training emissions</p>
+        </article>
+        <article class="panel">
+          <span class="label">Not disclosed</span>
+          <h3>GPT-4</h3>
+          <p>No public hardware, compute, energy, or training-cost figure.</p>
+        </article>
+      </div>
+      <p class="callout">
+        <strong>Time is not GPU-hours:</strong> A job using 16,000 GPUs for two
+        months and one using 2,000 GPUs for eight months can consume similar
+        GPU-hours but have different schedules, failure exposure, and facility
+        constraints.
+      </p>
+    </section>
+
+    <section id="takeaways">
+      <div class="section-heading">
+        <p class="section-kicker">06 · Key takeaways</p>
+        <h2>A model is a sociotechnical production system</h2>
+        <p>A strong model is the outcome of more than a large neural network.</p>
+      </div>
+      <ul class="takeaway-list">
+        <li>Data quality, diversity, and provenance shape what a model can learn.</li>
+        <li>Pretraining builds broad capability; post-training shapes assistant behavior.</li>
+        <li>Compute, networking, storage, and reliability determine whether training can scale.</li>
+        <li>Energy and emissions should be reported with clear boundaries and methodology.</li>
+        <li>Public cost claims need scope: the final run is not total R&amp;D or lifetime operating cost.</li>
+        <li>Evaluation, safety testing, and monitoring continue after deployment.</li>
+      </ul>
+    </section>
+
+    <section id="sources">
+      <div class="section-heading">
+        <p class="section-kicker">Selected sources</p>
+        <h2>References</h2>
+        <p>Sources named in the original presentation.</p>
+      </div>
+      <div class="source-grid">
+        <article class="source-card">
+          <a href="https://cdn.openai.com/papers/gpt-4.pdf" target="_blank" rel="noopener noreferrer">OpenAI (2023) · GPT-4 Technical Report</a>
+          <span>Technical report and disclosure context.</span>
+        </article>
+        <article class="source-card">
+          <a href="https://github.com/meta-llama/llama-models" target="_blank" rel="noopener noreferrer">Meta (2024) · Llama model repository</a>
+          <span>Model documentation and release materials.</span>
+        </article>
+        <article class="source-card">
+          <a href="https://ai.meta.com/blog/meta-llama-3-1/" target="_blank" rel="noopener noreferrer">Meta (2024) · Introducing Llama 3.1</a>
+          <span>Release announcement and model details.</span>
+        </article>
+        <article class="source-card">
+          <a href="https://arxiv.org/abs/2412.19437" target="_blank" rel="noopener noreferrer">DeepSeek (2024) · DeepSeek-V3 Technical Report</a>
+          <span>Model, training, and compute disclosures.</span>
+        </article>
+        <article class="source-card">
+          <a href="https://www.youtube.com/watch?v=5sLYAQS9sWQ" target="_blank" rel="noopener noreferrer">IBM Technology (2023) · How Do Large Language Models Work and Apply?</a>
+          <span>Introductory video on LLMs.</span>
+        </article>
+        <article class="source-card">
+          <a href="https://www.youtube.com/watch?v=OGmDr8TLtTo" target="_blank" rel="noopener noreferrer">Eye on Tech (2023) · What is ChatGPT?</a>
+          <span>Introductory video on ChatGPT.</span>
+        </article>
+        <article class="source-card">
+          <a href="https://writings.stephenwolfram.com/2023/02/what-is-chatgpt-doing-and-why-does-it-work/" target="_blank" rel="noopener noreferrer">Stephen Wolfram (2023) · What Is ChatGPT Doing … and Why Does It Work?</a>
+          <span>Long-form explanation of language model behavior.</span>
+        </article>
+      </div>
+      <p class="small-note">
+        Research snapshot: November 2026. Reported values and cost estimates
+        retain the scope and caveats described in the presentation.
+      </p>
+      <p class="small-note">
+        <a href="3.4%20Generative_AI_LLM_Infrastructure.pptx">Download the original presentation</a>
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Jingbin Wang · Generative AI LLM Infrastructure · Professional Portfolio</p>
+  </footer>
+</body>
+</html>
