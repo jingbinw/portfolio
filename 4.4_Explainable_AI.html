@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Jingbin Wang's portfolio presentation on explainable AI, validation, performance metrics, transparency, and accountable model use.">
+  <title>Explainable AI | Transparency, Validation &amp; Accountability</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #172b45;
+      --navy-soft: #2a4967;
+      --teal: #167c78;
+      --mint: #e7f3f1;
+      --gold: #efb54a;
+      --ink: #25364a;
+      --muted: #607184;
+      --paper: #f3f6f8;
+      --line: #dce4ea;
+      --white: #fff;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Arial, sans-serif;
+      line-height: 1.65;
+    }
+    a { color: var(--teal); }
+    a:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+    .hero {
+      padding: 58px 24px 62px;
+      background:
+        radial-gradient(ellipse at 86% 16%, #ffffff17, transparent 34%),
+        linear-gradient(135deg, var(--navy), var(--navy-soft));
+      color: var(--white);
+    }
+    .hero-content, main, .nav-content, footer {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+    .home-link {
+      display: inline-block;
+      margin-bottom: 28px;
+      color: #e1eaf2;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+    .home-link:hover { color: var(--white); text-decoration: underline; }
+    .eyebrow {
+      margin: 0 0 12px;
+      color: #f4c96e;
+      font-size: 0.77rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      max-width: 930px;
+      margin: 0;
+      font-size: clamp(1.8rem, 4.2vw, 3.2rem);
+      line-height: 1.08;
+    }
+    .hero-lead {
+      max-width: 770px;
+      margin: 20px 0;
+      color: #e0e9f1;
+      font-size: 1.1rem;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px 20px;
+      margin: 22px 0 0;
+      color: #d2deea;
+      font-size: 0.91rem;
+    }
+    nav {
+      position: sticky;
+      z-index: 3;
+      top: 0;
+      border-bottom: 1px solid var(--line);
+      background: #ffffffed;
+      backdrop-filter: blur(10px);
+    }
+    .nav-content { display: flex; gap: 6px; overflow-x: auto; padding: 10px 20px; }
+    nav a {
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      border-radius: 6px;
+      color: var(--navy);
+      font-size: 0.87rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    nav a:hover { background: #eaf0f4; }
+    main { padding: 32px 20px 20px; }
+    section {
+      margin-bottom: 24px;
+      padding: clamp(22px, 4vw, 35px);
+      border: 1px solid #e5ebef;
+      border-radius: 14px;
+      background: var(--white);
+      box-shadow: 0 5px 18px #172b450a;
+      scroll-margin-top: 74px;
+    }
+    .section-heading { margin-bottom: 20px; }
+    .section-kicker {
+      margin: 0 0 5px;
+      color: var(--teal);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    h2, h3 { color: var(--navy); line-height: 1.25; }
+    h2 { margin: 0; font-size: clamp(1.5rem, 3vw, 2rem); }
+    h3 { margin: 0 0 8px; font-size: 1.05rem; }
+    p { margin: 0 0 12px; }
+    p:last-child { margin-bottom: 0; }
+    .about-grid, .work-grid, .value-grid, .challenge-grid, .method-grid,
+    .industry-grid, .skill-grid, .reference-grid {
+      display: grid;
+      gap: 14px;
+    }
+    .about-grid { grid-template-columns: 1.35fr 0.85fr; }
+    .work-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .value-grid, .challenge-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .method-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .industry-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .skill-grid, .reference-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .panel, .value-card, .challenge-card, .method-card, .industry-card,
+    .skill-card, .reference-card {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f7f9fa;
+    }
+    .panel p, .value-card p, .challenge-card p, .method-card p,
+    .industry-card p, .skill-card p, .reference-card p { color: var(--muted); }
+    .panel.accent { border-top: 4px solid var(--teal); }
+    .panel.tint { background: var(--mint); }
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      color: var(--teal);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .value-card { border-top: 3px solid var(--teal); }
+    .challenge-card { border-left: 4px solid #d59a45; }
+    .challenge-card h3 { font-size: 0.98rem; }
+    .callout {
+      margin-top: 15px;
+      padding: 13px 15px;
+      border-left: 4px solid var(--gold);
+      background: #fff8e9;
+      color: #564a34;
+      font-size: 0.93rem;
+    }
+    .callout strong { color: var(--navy); }
+    .loop-wrap {
+      overflow-x: auto;
+      padding: 18px;
+      border-radius: 11px;
+      background: var(--navy);
+    }
+    .loop-diagram { display: block; width: min(100%, 940px); height: auto; margin: auto; }
+    .diagram-caption { margin-top: 10px; color: var(--muted); font-size: 0.86rem; text-align: center; }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .metric-card {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #f8fafb;
+    }
+    .metric-card h3 { font-size: 0.98rem; }
+    .metric-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .industry-card { border-top: 3px solid var(--navy-soft); }
+    .industry-card h3 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .industry-card h3 span { color: var(--teal); font-size: 0.68rem; letter-spacing: .06em; text-transform: uppercase; }
+    .industry-card p { margin: 0; font-size: 0.92rem; }
+    .method-card h3 { font-size: 0.98rem; }
+    .method-card p { margin: 0; font-size: 0.91rem; }
+    .skill-card ul { margin: 0; padding-left: 20px; color: var(--muted); }
+    .skill-card li + li { margin-top: 5px; }
+    .reference-grid { grid-template-columns: 1fr; }
+    .reference-card { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 12px; }
+    .reference-card p { margin: 0; font-size: 0.91rem; }
+    .reference-card a { font-size: 0.88rem; font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    .closing {
+      padding: 22px;
+      border-radius: 10px;
+      background: var(--navy);
+      color: var(--white);
+      text-align: center;
+    }
+    .closing strong { color: #f4c96e; }
+    .closing p { max-width: 820px; margin: 0 auto; }
+    footer { padding: 12px 20px 32px; color: var(--muted); font-size: 0.9rem; text-align: center; }
+    @media (max-width: 820px) {
+      .work-grid, .method-grid, .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 620px) {
+      .hero { padding: 45px 20px; }
+      .about-grid, .work-grid, .value-grid, .challenge-grid, .method-grid,
+      .industry-grid, .skill-grid, .metric-grid { grid-template-columns: 1fr; }
+      .loop-diagram { width: 820px; max-width: none; }
+      .loop-wrap { padding: 10px; }
+      .reference-card { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-content">
+      <a class="home-link" href="index.html">← Portfolio home</a>
+      <p class="eyebrow">Portfolio presentation · Assignment 4.4 · Model Development</p>
+      <h1>Explainable Artificial Intelligence</h1>
+      <p class="hero-lead">
+        Understanding AI decisions, testing model reliability, and examining
+        industry efforts to improve transparency from explanations and
+        validation to ongoing accountability.
+      </p>
+      <div class="hero-meta">
+        <span><strong>Jingbin Wang</strong></span>
+        <span>Indiana Wesleyan University · AIML-501-01R3A</span>
+        <span>November 2026</span>
+      </div>
+      <div class="hero-actions">
+        <a class="button" href="4.4_Explainability_Presentation.pptx">Download the presentation</a>
+      </div>
+    </div>
+  </header>
+
+  <nav aria-label="Page sections">
+    <div class="nav-content">
+      <a href="#about">About Me</a>
+      <a href="#work">Work Samples</a>
+      <a href="#skills">Skills</a>
+      <a href="#importance">Why XAI</a>
+      <a href="#challenges">Challenges</a>
+      <a href="#validation">Validation</a>
+      <a href="#industry">Industry Efforts</a>
+      <a href="#methods">Techniques</a>
+      <a href="#references">References</a>
+    </div>
+  </nav>
+
+  <main>
+    <section id="about">
+      <div class="section-heading">
+        <p class="section-kicker">About Me</p>
+        <h2>Making complex AI easier to evaluate</h2>
+      </div>
+      <div class="about-grid">
+        <article class="panel accent">
+          <p>
+            I’m Jingbin Wang, an AI and machine learning student focused on
+            understanding how AI systems work, how well they perform, and how
+            people can responsibly evaluate their outputs. My career goal is
+            to contribute to the development of reliable, transparent AI
+            systems and continue growing my skills in model development,
+            explainability, and data science.
+          </p>
+          <p>
+            A strength I bring to this work is connecting technical evidence
+            with human and organizational needs. I approach AI questions
+            thoughtfully - considering limitations, error patterns, fairness,
+            human review, and accountability, not only headline performance.
+          </p>
+        </article>
+        <aside class="panel tint">
+          <span class="label">Guiding principle</span>
+          <h3>Trust is built through evidence—not confidence.</h3>
+          <p>
+            Explanations should help people investigate and challenge outcomes,
+            while validation and monitoring test whether the system works as
+            intended.
+          </p>
+        </aside>
+      </div>
+    </section>
+
+    <section id="work">
+      <div class="section-heading">
+        <p class="section-kicker">Work Samples and Project Descriptions</p>
+        <h2>Explainable AI: transparency, validation, and accountability</h2>
+        <p>
+          A presentation examining why AI decisions need to be understandable
+          and testable, what makes explanation difficult, and how organizations
+          can document and monitor model reliability.
+        </p>
+      </div>
+      <div class="work-grid">
+        <article class="panel">
+          <span class="label">Context</span>
+          <h3>AI decisions affect people</h3>
+          <p>
+            AI outputs can influence access to services, safety, work, and
+            other important decisions. People need ways to understand,
+            question, and review AI-assisted outcomes.
+          </p>
+        </article>
+        <article class="panel">
+          <span class="label">Challenge</span>
+          <h3>Complex models are hard to audit</h3>
+          <p>
+            Large models have many interacting parameters, context-sensitive
+            behavior, limited public access, and explanations that can sound
+            plausible without faithfully describing how an output was produced.
+          </p>
+        </article>
+        <article class="panel">
+          <span class="label">Approach &amp; solution</span>
+          <h3>Connect explanation to evidence</h3>
+          <p>
+            I organized the topic around practical explanation techniques,
+            a repeatable validation loop, performance and subgroup metrics,
+            industry transparency efforts, and the documentation and ownership
+            needed for accountability.
+          </p>
+        </article>
+      </div>
+      <p class="callout">
+        <strong>Project takeaway:</strong> A clear-looking explanation alone
+        is not enough. Evaluate whether it is faithful, consistent, and useful;
+        measure model behavior under relevant conditions; and preserve a record
+        of limitations, owners, and escalation paths.
+      </p>
+    </section>
+
+    <section id="skills">
+      <div class="section-heading">
+        <p class="section-kicker">Skills Section</p>
+        <h2>Knowledge and techniques demonstrated</h2>
+        <p>
+          This presentation demonstrates subject knowledge and research—not
+          claims of implementing or auditing these systems in production.
+        </p>
+      </div>
+      <div class="skill-grid">
+        <article class="skill-card">
+          <h3>Explainability &amp; interpretability</h3>
+          <ul>
+            <li>Explainable AI concepts and human-centered explanation design</li>
+            <li>Feature attribution: SHAP and LIME</li>
+            <li>Counterfactual and example-based explanations</li>
+            <li>Mechanistic interpretability, features, and circuits</li>
+          </ul>
+        </article>
+        <article class="skill-card">
+          <h3>Model validation &amp; measurement</h3>
+          <ul>
+            <li>Held-out evaluation, benchmarks, expert review, and adversarial tests</li>
+            <li>Accuracy, precision, recall, F1, and error rates</li>
+            <li>Calibration, robustness, subgroup analysis, and fairness gaps</li>
+            <li>Error diagnosis, limitations, and uncertainty communication</li>
+          </ul>
+        </article>
+        <article class="skill-card">
+          <h3>Responsible AI &amp; accountability</h3>
+          <ul>
+            <li>NIST AI Risk Management Framework (Govern, Map, Measure, Manage)</li>
+            <li>Risk documentation, audit records, and model/system cards</li>
+            <li>Human review, appeal, escalation, and incident ownership</li>
+            <li>Post-deployment monitoring and drift awareness</li>
+          </ul>
+        </article>
+        <article class="skill-card">
+          <h3>Research areas &amp; model ecosystems</h3>
+          <ul>
+            <li>Large language model explainability and monitorability</li>
+            <li>OpenAI GPT, Anthropic Claude, Google Gemini, and Meta Llama</li>
+            <li>Red teaming, safety evaluation, and independent audits</li>
+            <li>Research synthesis and clear technical communication</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="importance">
+      <div class="section-heading">
+        <p class="section-kicker">01 · Explainable AI &amp; its importance</p>
+        <h2>What explainability helps people do</h2>
+        <p>
+          Explainable AI (XAI) refers to methods and practices that help people
+          understand, evaluate, and question how an AI system produces an output.
+          It can surface influential inputs, model behavior, uncertainty,
+          limitations, and supporting evidence.
+        </p>
+      </div>
+      <div class="value-grid">
+        <article class="value-card">
+          <h3>Human oversight</h3>
+          <p>Give people information to review and challenge AI-assisted outcomes.</p>
+        </article>
+        <article class="value-card">
+          <h3>Error detection</h3>
+          <p>Support investigation of unexpected, incorrect, or harmful outputs.</p>
+        </article>
+        <article class="value-card">
+          <h3>Fairness checks</h3>
+          <p>Help teams identify uneven performance across relevant groups.</p>
+        </article>
+        <article class="value-card">
+          <h3>Accountability</h3>
+          <p>Document decisions, evidence, owners, and known limitations.</p>
+        </article>
+      </div>
+      <p class="callout"><strong>Why transparency matters:</strong> AI outputs can affect access to services, safety, work, and important decisions. People need enough information to detect errors, contest outcomes, assess bias, understand limits, and assign responsibility.</p>
+    </section>
+
+    <section id="challenges">
+      <div class="section-heading">
+        <p class="section-kicker">02 · Challenges in explainability</p>
+        <h2>Why “show me why” is not a simple request</h2>
+      </div>
+      <div class="challenge-grid">
+        <article class="challenge-card">
+          <h3>Model complexity</h3>
+          <p>Large neural networks contain billions of interacting parameters; learned information is distributed across layers and features.</p>
+        </article>
+        <article class="challenge-card">
+          <h3>Black-box decision-making</h3>
+          <p>Internal computation can be difficult to translate into a simple, faithful, human-readable reason.</p>
+        </article>
+        <article class="challenge-card">
+          <h3>Context sensitivity</h3>
+          <p>Outputs can change with prompts, conversation history, tools, sampling, and deployment settings.</p>
+        </article>
+        <article class="challenge-card">
+          <h3>Plausible but unfaithful rationales</h3>
+          <p>A fluent explanation may sound convincing without accurately reflecting the process that generated the answer.</p>
+        </article>
+        <article class="challenge-card">
+          <h3>Limited access &amp; documentation</h3>
+          <p>Training data, weights, system instructions, and safeguards may not be publicly inspectable.</p>
+        </article>
+        <article class="challenge-card">
+          <h3>Regulatory &amp; accountability demands</h3>
+          <p>High-impact uses may require traceability, documentation, human review, risk management, and routes to contest decisions.</p>
+        </article>
+      </div>
+      <p class="callout">
+        <strong>Core issue:</strong> A model can score well on a benchmark and
+        still be difficult to audit, challenge, or govern.
+      </p>
+    </section>
+
+    <section id="validation">
+      <div class="section-heading">
+        <p class="section-kicker">03 · Validation &amp; performance metrics</p>
+        <h2>From measurement to accountable use</h2>
+        <p>
+          Validation checks whether a model is dependable for its intended
+          use; metrics turn that evidence into measurable signals.
+        </p>
+      </div>
+      <div class="loop-wrap">
+        <svg class="loop-diagram" viewBox="0 0 960 250" role="img" aria-labelledby="loop-title loop-desc">
+          <title id="loop-title">Five-step model validation and monitoring loop</title>
+          <desc id="loop-desc">Define intended task and acceptable error, test using held-out data and expert or adversarial tests, compare metrics against baselines and thresholds, diagnose errors across classes and groups, and monitor drift and feedback after launch. Monitoring feeds back into definition and testing.</desc>
+          <defs>
+            <marker id="loop-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L9,3 z" fill="#efb54a"></path>
+            </marker>
+          </defs>
+          <g fill="#fff" stroke="#78b8b2" stroke-width="2">
+            <rect x="22" y="58" width="155" height="90" rx="14"></rect>
+            <rect x="213" y="58" width="155" height="90" rx="14"></rect>
+            <rect x="404" y="58" width="155" height="90" rx="14"></rect>
+            <rect x="595" y="58" width="155" height="90" rx="14"></rect>
+            <rect x="786" y="58" width="155" height="90" rx="14"></rect>
+          </g>
+          <g fill="#167c78" font-family="Arial, sans-serif" font-size="12" font-weight="700" text-anchor="middle">
+            <text x="99" y="84">1 · DEFINE</text>
+            <text x="290" y="84">2 · TEST</text>
+            <text x="481" y="84">3 · COMPARE</text>
+            <text x="672" y="84">4 · DIAGNOSE</text>
+            <text x="863" y="84">5 · MONITOR</text>
+          </g>
+          <g fill="#25364a" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">
+            <text x="99" y="108"><tspan x="99">Task, users, context,</tspan><tspan x="99" dy="17">risk &amp; acceptable error</tspan></text>
+            <text x="290" y="108"><tspan x="290">Held-out data,</tspan><tspan x="290" dy="17">benchmarks, experts,</tspan><tspan x="290" dy="17">adversarial tests</tspan></text>
+            <text x="481" y="108"><tspan x="481">Metrics vs.</tspan><tspan x="481" dy="17">baselines &amp; required</tspan><tspan x="481" dy="17">thresholds</tspan></text>
+            <text x="672" y="108"><tspan x="672">Errors by class,</tspan><tspan x="672" dy="17">language, subgroup</tspan><tspan x="672" dy="17">&amp; scenario</tspan></text>
+            <text x="863" y="108"><tspan x="863">Drift, incidents,</tspan><tspan x="863" dy="17">feedback &amp; post-launch</tspan><tspan x="863" dy="17">performance</tspan></text>
+          </g>
+          <g fill="none" stroke="#efb54a" stroke-width="3" marker-end="url(#loop-arrow)">
+            <path d="M180 103 H205"></path><path d="M371 103 H396"></path>
+            <path d="M562 103 H587"></path><path d="M753 103 H778"></path>
+            <path d="M864 155 C864 219 100 219 100 156"></path>
+          </g>
+          <text x="482" y="212" fill="#f3d48f" font-family="Arial, sans-serif" font-size="12" text-anchor="middle">Monitoring findings inform the next evaluation cycle</text>
+        </svg>
+      </div>
+      <p class="diagram-caption">A practical cycle adapted from the presentation; validation continues after launch.</p>
+      <h3 style="margin-top: 22px;">Key performance metrics — what they tell us</h3>
+      <div class="metric-grid">
+        <article class="metric-card">
+          <h3>Accuracy / exact match</h3>
+          <p>Overall proportion of correct answers.</p>
+        </article>
+        <article class="metric-card">
+          <h3>Precision, recall / F1</h3>
+          <p>Balance between false alarms and missed correct cases.</p>
+        </article>
+        <article class="metric-card">
+          <h3>False-positive / false-negative rates</h3>
+          <p>How often harmful or incorrect decisions are made—or missed.</p>
+        </article>
+        <article class="metric-card">
+          <h3>Calibration</h3>
+          <p>Whether stated confidence corresponds to actual correctness.</p>
+        </article>
+        <article class="metric-card">
+          <h3>Robustness</h3>
+          <p>Whether performance holds under paraphrases, noise, and distribution shifts.</p>
+        </article>
+        <article class="metric-card">
+          <h3>Fairness gaps</h3>
+          <p>Whether error rates differ across relevant user groups.</p>
+        </article>
+      </div>
+      <p class="callout">
+        <strong>Reliability + accountability:</strong> Publish test conditions
+        and limitations, keep audit records, assign owners, and require human
+        escalation for consequential cases.
+      </p>
+      <div class="panel" style="margin-top: 15px;">
+        <h3>A useful evidence record includes</h3>
+        <ul>
+          <li>Intended purpose, users, deployment context, and excluded uses</li>
+          <li>Datasets, sample sizes, benchmark versions, and test conditions</li>
+          <li>Metric definitions, results, uncertainty, and subgroup breakdowns</li>
+          <li>Known limitations, residual risks, mitigations, and escalation paths</li>
+          <li>Who approved deployment, who monitors it, and how incidents are handled</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="industry">
+      <div class="section-heading">
+        <p class="section-kicker">04 · Current solutions &amp; industry efforts</p>
+        <h2>Transparency work across model ecosystems</h2>
+        <p>
+          Leading organizations combine documentation, systematic evaluations,
+          and research into model internals. These efforts improve oversight,
+          but do not guarantee complete explanations.
+        </p>
+      </div>
+      <div class="industry-grid">
+        <article class="industry-card">
+          <h3>OpenAI — GPT <span>Documentation &amp; research</span></h3>
+          <p>
+            System cards and evaluation reports describe capabilities, risks,
+            and mitigations. Chain-of-thought monitorability research tests
+            whether reasoning traces can help detect misbehavior; such traces
+            are not proof of faithful explanations.
+          </p>
+        </article>
+        <article class="industry-card">
+          <h3>Anthropic — Claude <span>Mechanistic interpretability</span></h3>
+          <p>
+            Research on internal features and circuits—including sparse
+            autoencoders and attribution graphs—aims to identify concepts
+            represented inside networks. System cards document safety
+            evaluations and limitations.
+          </p>
+        </article>
+        <article class="industry-card">
+          <h3>Google DeepMind — Gemini <span>Model documentation</span></h3>
+          <p>
+            Model cards and technical reports describe intended use,
+            capabilities, evaluation results, and limitations. Responsible-AI
+            evaluations and red teaming examine safety, fairness, and
+            performance across scenarios.
+          </p>
+        </article>
+        <article class="industry-card">
+          <h3>Meta — Llama <span>Responsible-use materials</span></h3>
+          <p>
+            Model cards, responsible-use guidance, benchmark evaluations, red
+            teaming, and safety testing communicate model behavior and risks.
+            Open-weight availability can enable outside research, but access
+            alone does not make a model interpretable.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="methods">
+      <div class="section-heading">
+        <p class="section-kicker">Explainability techniques</p>
+        <h2>Different methods answer different questions</h2>
+      </div>
+      <div class="method-grid">
+        <article class="method-card">
+          <h3>Feature attribution</h3>
+          <p>Estimates which input features most influenced an output (e.g., SHAP or LIME). Useful for debugging, but attribution is not automatically causal.</p>
+        </article>
+        <article class="method-card">
+          <h3>Counterfactual explanations</h3>
+          <p>Shows how an outcome might change if selected input details were different; helps users understand decision boundaries.</p>
+        </article>
+        <article class="method-card">
+          <h3>Example-based explanations</h3>
+          <p>Shows similar cases, prototypes, or influential examples to make model behavior more concrete.</p>
+        </article>
+        <article class="method-card">
+          <h3>Mechanistic interpretability</h3>
+          <p>Studies internal activations, features, and circuits to investigate how information is represented and processed.</p>
+        </article>
+        <article class="method-card">
+          <h3>Documentation &amp; audit</h3>
+          <p>Model cards, system cards, data documentation, test reports, audit trails, and known-limitations statements support review.</p>
+        </article>
+        <article class="method-card">
+          <h3>Human-centered explanation design</h3>
+          <p>Tests whether explanations are understandable and useful; supports appeal, human review, and escalation.</p>
+        </article>
+      </div>
+      <p class="callout">
+        <strong>Caution:</strong> Post-hoc explanations can be incomplete or
+        unstable. Evaluate fidelity, consistency, and usefulness—not just
+        whether an explanation looks clear.
+      </p>
+      <p class="small-note">Cross-industry efforts also include independent audits, system/model cards, feature attribution, counterfactuals, example-based explanations, and mechanistic interpretability.</p>
+    </section>
+
+    <section id="conclusion">
+      <div class="section-heading">
+        <p class="section-kicker">Conclusion</p>
+        <h2>Explain · Validate · Measure</h2>
+      </div>
+      <div class="value-grid">
+        <article class="value-card">
+          <h3>Explain</h3>
+          <p>Make behavior legible so people can understand and challenge AI outputs.</p>
+        </article>
+        <article class="value-card">
+          <h3>Validate</h3>
+          <p>Test against the real risks and conditions of the intended use.</p>
+        </article>
+        <article class="value-card">
+          <h3>Measure</h3>
+          <p>Track outcomes, errors, and trade-offs over time.</p>
+        </article>
+        <article class="value-card">
+          <h3>Stay accountable</h3>
+          <p>Assign owners, preserve evidence, and keep human review available.</p>
+        </article>
+      </div>
+      <div class="closing" style="margin-top: 16px;">
+        <p>
+          A trustworthy AI system is not one that never fails. It is one
+          <strong>whose limits are known, whose failures can be detected, and
+          whose use remains accountable to people.</strong>
+        </p>
+      </div>
+    </section>
+
+    <section id="references">
+      <div class="section-heading">
+        <p class="section-kicker">Selected references &amp; further reading</p>
+        <h2>Research sources</h2>
+        <p>Research snapshot prepared November 2026. Consult current model/system cards for updates.</p>
+      </div>
+      <div class="reference-grid">
+        <article class="reference-card">
+          <p>NIST (2023). <em>Artificial Intelligence Risk Management Framework (AI RMF 1.0).</em></p>
+          <a href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf" target="_blank" rel="noopener noreferrer">Read report ↗</a>
+        </article>
+        <article class="reference-card">
+          <p>NIST. <em>AI RMF Playbook — Measure function.</em></p>
+          <a href="https://airc.nist.gov/airmf-resources/playbook/measure/" target="_blank" rel="noopener noreferrer">Read playbook ↗</a>
+        </article>
+        <article class="reference-card">
+          <p>Zhao, H. et al. (2024). <em>Explainability for Large Language Models: A Survey.</em> ACM TIST.</p>
+          <a href="https://doi.org/10.1145/3639372" target="_blank" rel="noopener noreferrer">View publication ↗</a>
+        </article>
+        <article class="reference-card">
+          <p>OpenAI. <em>Evaluating chain-of-thought monitorability.</em></p>
+          <a href="https://openai.com/index/evaluating-chain-of-thought-monitorability/" target="_blank" rel="noopener noreferrer">Read research ↗</a>
+        </article>
+        <article class="reference-card">
+          <p>Anthropic. <em>Decomposing language models into understandable components.</em></p>
+          <a href="https://www.anthropic.com/research/decomposing-language-models-into-understandable-components" target="_blank" rel="noopener noreferrer">Read research ↗</a>
+        </article>
+        <article class="reference-card">
+          <p>Google DeepMind. <em>Model cards.</em></p>
+          <a href="https://deepmind.google/models/model-cards/" target="_blank" rel="noopener noreferrer">Browse cards ↗</a>
+        </article>
+        <article class="reference-card">
+          <p>Meta. <em>Our responsible approach to Meta AI and Meta Llama 3.</em></p>
+          <a href="https://ai.meta.com/blog/meta-llama-3-meta-ai-responsibility/" target="_blank" rel="noopener noreferrer">Read article ↗</a>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Jingbin Wang · Assignment 4.4 · Explainable Artificial Intelligence</p>
+  </footer>
+</body>
+</html>
